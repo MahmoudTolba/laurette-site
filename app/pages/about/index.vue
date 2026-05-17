@@ -1,9 +1,9 @@
 <template>
-    <main class="min-h-screen bg-white font-sans pt-32 pb-20 md:pt-40 lg:pt-44" dir="ltr">
+    <main class="min-h-screen bg-primary font-sans pt-40 pb-20 md:pt-48 lg:pt-56" dir="ltr">
       
-      <section class="container mx-auto px-4 max-w-6xl mb-16 md:mb-24">
+      <section class="container mx-auto px-4 max-w-6xl mb-16 md:mb-24 relative z-10">
         <div class="text-center max-w-2xl mx-auto space-y-4">
-          <span class="text-xs font-bold tracking-widest uppercase text-pink-600 animate-pulse-slow">Our Story</span>
+          <span class="text-xs font-bold tracking-widest uppercase text-pink-600 animate-pulse-slow block">Our Story</span>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif text-[#1F0D1C] leading-tight tracking-tight">
             Redefining Beauty Through Clean Science
           </h1>
@@ -14,30 +14,30 @@
         </div>
       </section>
   
-      <section class="bg-gray-50/60 py-16 md:py-24 border-y border-gray-100">
+      <section class="bg-gray-50/60 py-16 md:py-24 border-y border-gray-100 relative z-10">
         <div class="container mx-auto px-4 max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          <div class="lg:col-span-6 grid grid-cols-12 gap-4 relative w-full items-end">
-            <div class="col-span-8 overflow-hidden rounded-2xl shadow-md aspect-[4/5] bg-gray-200 group">
+          <div class="lg:col-span-6 grid grid-cols-12 gap-4 relative w-full items-end min-h-[300px] md:min-h-[400px]">
+            <div class="col-span-8 overflow-hidden rounded-2xl shadow-md aspect-[4/5] bg-gray-100 group w-full">
               <img 
                 src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600" 
                 alt="Natural Skincare textures" 
-                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 block"
                 loading="lazy"
               />
             </div>
-            <div class="col-span-4 overflow-hidden rounded-2xl shadow-md aspect-square bg-gray-200 group">
+            <div class="col-span-4 overflow-hidden rounded-2xl shadow-md aspect-square bg-gray-100 group w-full">
               <img 
                 src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=400" 
                 alt="Korean Beauty serums" 
-                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 block"
                 loading="lazy"
               />
             </div>
           </div>
   
-          <div class="lg:col-span-6 space-y-6">
-            <h2 class="text-3xl md:text-4xl font-serif text-[#1F0D1C]">Crafted For Your Skin's Health</h2>
+          <div class="lg:col-span-6 space-y-6 w-full">
+            <h2 class="text-3xl md:text-4xl font-serif text-[#1F0D1C] leading-snug">Crafted For Your Skin's Health</h2>
             <p class="text-gray-600 text-sm md:text-base leading-relaxed">
               Founded by skincare experts who grew tired of toxic additives and confusing ingredient labels, Laurette was born from a singular mission: to deliver safe, highly-effective, non-toxic products designed for all skin tones and complexities.
             </p>
@@ -64,7 +64,7 @@
         </div>
       </section>
   
-      <section class="container mx-auto px-4 max-w-6xl py-16 md:py-24">
+      <section class="container mx-auto px-4 max-w-6xl py-16 md:py-24 relative z-10">
         <div class="text-center max-w-md mx-auto mb-16 space-y-2">
           <h2 class="text-3xl font-serif text-[#1F0D1C]">The Laurette Pillars</h2>
           <p class="text-xs text-gray-400 uppercase tracking-widest font-medium">What guides our selection</p>
@@ -103,7 +103,7 @@
         </div>
       </section>
   
-      <section class="container mx-auto px-4 max-w-5xl mb-8">
+      <section class="container mx-auto px-4 max-w-5xl mb-8 relative z-10">
         <div class="bg-[#1F0D1C] rounded-3xl p-8 md:p-16 text-center text-white relative overflow-hidden shadow-xl">
           <div class="absolute inset-0 bg-gradient-to-tr from-pink-900/40 to-transparent pointer-events-none"></div>
           <div class="relative z-10 max-w-xl mx-auto space-y-6">
@@ -125,7 +125,6 @@
   </template>
   
   <script setup>
-  // Adding specialized page layouts SEO parameters
   useHead({
     title: 'Our Story & Brand Philosophy | Laurette Store',
     meta: [

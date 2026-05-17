@@ -110,7 +110,7 @@
   
   const infoLinks = [
     { name: 'About Us', path: '/about' },
-    { name: 'Contact Support', path: '/contact' },
+    { name: 'Contact Support', path: '/ContactUs' },
     { name: 'Shipping & Returns', path: '/shipping' },
     { name: 'Privacy Policy', path: '/privacy' },
     { name: 'Terms of Service', path: '/terms' },
