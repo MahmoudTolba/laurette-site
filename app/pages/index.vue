@@ -2,7 +2,8 @@
     <div class="home">
   
       <!-- HERO SECTION -->
-      <section class="hero">
+       <HomeHero />
+      <!-- <section class="hero">
         <div class="hero-content">
           <h1>Welcome To Laurette Store</h1>
   
@@ -14,16 +15,18 @@
             Shop Now
           </NuxtLink>
         </div>
-      </section>
+      </section> -->
   
       <!-- FEATURED PRODUCTS -->
       <section class="products-section">
+        
   
-        <h2 class="section-title">
+        <!-- <h2 class="section-title">
           Featured Products
-        </h2>
+        </h2> -->
+        <HomeCategories />
   
-        <div class="products-grid">
+        <!-- <div class="products-grid">
   
           <div
             v-for="product in products"
@@ -53,9 +56,10 @@
   
           </div>
   
-        </div>
+        </div> -->
   
       </section>
+      <HomeOffers />
   
     </div>
   </template>
