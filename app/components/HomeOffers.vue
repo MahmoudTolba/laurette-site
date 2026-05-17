@@ -4,6 +4,8 @@
         
         <div class="text-center mb-12 max-w-xl mx-auto space-y-3">
           <h2 class="text-4xl lg:text-5xl font-serif text-[#2D1B2D]">Offers</h2>
+          <div class="w-20 h-1.5 bg-gradient-to-l from-purple-800 to-pink-500 mx-auto rounded-full"></div>
+
           <p class="text-gray-600 text-[15px] leading-relaxed">
             Made using clean, non-toxic ingredients, our products are designed for everyone.
           </p>
