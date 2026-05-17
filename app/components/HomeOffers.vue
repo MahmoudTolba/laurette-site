@@ -1,5 +1,5 @@
 <template>
-    <section class="py-16 bg-white font-sans" dir="ltr">
+    <section id="home-offers" class="py-16 bg-white font-sans" dir="ltr">
       <div class="container mx-auto px-4">
         
         <div class="text-center mb-12 max-w-xl mx-auto space-y-3">
@@ -11,7 +11,7 @@
           </p>
         </div>
   
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 px-9 ">
           <div 
             v-for="product in products" 
             :key="product.id" 
@@ -66,6 +66,11 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="text-center mt-12">
+            <NuxtLink to="/products" class="bg-primary text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-primary/80 transition-colors duration-300">
+                View All Products
+            </NuxtLink>
         </div>
   
       </div>

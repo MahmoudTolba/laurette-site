@@ -1,102 +1,114 @@
 <template>
-    <section class="relative h-[60vh] md:h-[80vh] w-full overflow-hidden font-['Cairo']" dir="rtl">
-      <!-- الخلفية: صورة احترافية مع Overlay متدرج -->
-      <div class="absolute inset-0">
+    <section class="relative min-h-[90vh] lg:min-h-screen w-full overflow-hidden font-sans flex flex-col justify-center" dir="ltr">
+      
+      <div class="absolute inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=2070&auto=format&fit=crop" 
           alt="Hero Background" 
           class="w-full h-full object-cover object-center transform scale-105 animate-slow-zoom"
         />
-        <!-- طبقة تظليل لجعل النص مقروءاً (Gradient Overlay) -->
-        <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
       </div>
   
-      <!-- المحتوى -->
-      <div class="container mx-auto px-4 h-full relative z-10 flex items-center">
-        <div class="max-w-2xl text-white space-y-6 md:space-y-8">
+      <div class="container mx-auto px-4 relative z-10 pt-36 pb-24 md:pt-44 md:pb-16">
+        <div class="max-w-2xl text-white space-y-5 md:space-y-6">
           
-          <!-- Badge صغير -->
-          <span class="inline-block bg-pink-600/90 text-white px-4 py-1 rounded-full text-sm font-bold tracking-wider animate-fade-in-down">
-            وصل حديثاً: المنتجات الكورية الأصلية
+          <span class="inline-block bg-pink-600/90 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider animate-fade-in-down">
+            New Arrival: Authentic Korean Products
           </span>
   
-          <!-- العنوان الرئيسي -->
-          <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight animate-fade-in-right">
-            أهلاً بك في <span class="text-pink-500">لوريت ستور</span>
+          <h1 class="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight animate-fade-in-left">
+            Welcome to <span class="text-pink-500">Laurette Store</span>
             <br />
-            جمالك يبدأ من هنا
+            Your Beauty Starts Here
           </h1>
   
-          <!-- الوصف -->
-          <p class="text-lg md:text-xl text-gray-200 max-w-lg leading-relaxed animate-fade-in-up delay-200">
-            اكتشفي أحدث صيحات العناية بالبشرة، المكياج، ومنتجات العناية الكورية المختارة بعناية لتناسب روتينك اليومي.
+          <p class="text-sm md:text-base lg:text-lg text-gray-200 max-w-lg leading-relaxed animate-text-entry">
+            Discover the latest fashion trends, advanced skincare solutions, makeup essentials, and curated Korean care routines tailored just for you.
           </p>
   
-          <!-- الأزرار -->
-          <div class="flex flex-wrap gap-4 animate-fade-in-up delay-500">
+          <div class="flex flex-wrap gap-4 pt-2 relative z-20 animate-buttons-entry">
+            
             <NuxtLink 
               to="/products" 
-              class="group relative overflow-hidden bg-white text-purple-900 px-8 py-4 rounded-full font-bold text-lg shadow-xl hover:shadow-pink-500/20 transition-all duration-300"
+              class="group relative overflow-hidden bg-white text-purple-900 px-8 py-3.5 rounded-full font-bold text-base md:text-lg shadow-xl hover:shadow-pink-500/30 transition-all duration-300 block"
             >
-              <span class="relative z-10">تسوقي الآن</span>
+              <span class="relative z-10 block">Shop Now</span>
               <div class="absolute inset-0 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-              <span class="absolute inset-0 group-hover:text-white transition-colors duration-300"></span>
             </NuxtLink>
   
             <NuxtLink 
-              to="/contact" 
-              class="border-2 border-white/50 hover:border-white text-white px-8 py-4 rounded-full font-bold text-lg backdrop-blur-sm transition-all"
+              to="/ContactUs" 
+              class="border-2 border-white/60 hover:border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-full font-bold text-base md:text-lg backdrop-blur-sm transition-all block"
             >
-              تواصل معنا
+              Contact Us
             </NuxtLink>
           </div>
         </div>
       </div>
   
-      <!-- مؤشر تمرير سفلي (Scroll Indicator) -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden md:block">
-        <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-          <div class="w-1 h-2 bg-white rounded-full mt-2"></div>
-        </div>
-      </div>
+      <button 
+        @click="scrollToOffers" 
+        class="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-1 text-white/70 hover:text-pink-500 transition-colors duration-300 focus:outline-none animate-bounce z-20 group"
+        aria-label="Scroll to offers"
+      >
+        <span class="text-[10px] tracking-widest uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">Offers</span>
+        <Icon name="heroicons:chevron-double-down" class="w-6 h-6 drop-shadow-md" />
+      </button>
     </section>
   </template>
   
+  <script setup>
+  const scrollToOffers = () => {
+    const offersSection = document.getElementById('offers');
+    if (offersSection) {
+      offersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  </script>
+  
   <style scoped>
-  /* انيميشن الزوم الهادئ للخلفية */
+  /* Cinematic Background Zoom */
   @keyframes slow-zoom {
     0% { transform: scale(1); }
-    100% { transform: scale(1.1); }
+    100% { transform: scale(1.08); }
   }
   .animate-slow-zoom {
     animation: slow-zoom 20s infinite alternate ease-in-out;
   }
   
-  /* انيميشن النصوص */
-  .animate-fade-in-right {
-    animation: fadeInRight 1s ease-out forwards;
-  }
-  .animate-fade-in-up {
-    animation: fadeInUp 1s ease-out forwards;
-    opacity: 0;
+  /* Core Element Animations */
+  .animate-fade-in-left {
+    animation: fadeInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-fade-in-down {
-    animation: fadeInDown 0.8s ease-out forwards;
+    animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
-  @keyframes fadeInRight {
-    from { opacity: 0; transform: translateX(50px); }
+  /* Safe Transitions for Description and Buttons */
+  .animate-text-entry {
+    animation: fadeInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    opacity: 0;
+  }
+  
+  .animate-buttons-entry {
+    animation: slideUpAppear 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    opacity: 0;
+  }
+  
+  /* Keyframes Definitions */
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
     to { opacity: 1; transform: translateX(0); }
   }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  
   @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
+    from { opacity: 0; transform: translateY(-15px); }
     to { opacity: 1; transform: translateY(0); }
   }
   
-  .delay-200 { animation-delay: 0.2s; }
-  .delay-500 { animation-delay: 0.5s; }
+  @keyframes slideUpAppear {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   </style>

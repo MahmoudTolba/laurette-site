@@ -105,7 +105,7 @@
     { name: 'Make Up', path: '/makeup', icon: 'uil:brush-alt' },
     { name: 'Routines', path: '/routines', icon: 'uil:schedule' },
     { name: 'About Us', path: '/about', icon: 'uil:info-circle' },
-    { name: 'Contact', path: '/contact', icon: 'uil:envelope' },
+    { name: 'Contact Us', path: '/ContactUs', icon: 'uil:envelope' },
   ];
   </script>
   
