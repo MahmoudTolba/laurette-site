@@ -74,14 +74,14 @@
   
   .home {
     min-height: 100vh;
-    background: #f5f5f5;
+    background: #F5F1ED;
   }
   
   /* HERO */
   
   .hero {
     height: 500px;
-    background: linear-gradient(to right, #111, #333);
+    background: linear-gradient(to right, #5C4033, #A67563);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -102,7 +102,7 @@
   
   .shop-btn {
     background: white;
-    color: black;
+    color: #1F1B19;
     padding: 12px 24px;
     border-radius: 8px;
     text-decoration: none;
@@ -111,7 +111,7 @@
   }
   
   .shop-btn:hover {
-    background: #ddd;
+    background: #D5C3BC;
   }
   
   /* PRODUCTS */
@@ -163,12 +163,12 @@
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #111;
+    color: #1F1B19;
   }
   
   .details-btn {
     display: inline-block;
-    background: black;
+    background: #5C4033;
     color: white;
     padding: 10px 18px;
     border-radius: 8px;
@@ -177,7 +177,7 @@
   }
   
   .details-btn:hover {
-    background: #444;
+    background: #C28E78;
   }
   
   /* RESPONSIVE */

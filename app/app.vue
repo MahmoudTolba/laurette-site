@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-secondary">
+  <div class="bg-background min-h-screen">
     <AppHeader />
     <NuxtPage />
     <AppFooter />

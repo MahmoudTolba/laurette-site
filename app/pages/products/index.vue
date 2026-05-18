@@ -1,33 +1,33 @@
 <template>
-    <main class="min-h-screen bg-gray-50/50 font-sans pt-36 pb-20 lg:pt-44" dir="ltr">
+    <main class="min-h-screen bg-background font-sans pt-36 pb-20 lg:pt-44" dir="ltr">
       <div class="container mx-auto px-4 max-w-7xl">
         
         <div class="text-center max-w-xl mx-auto mb-12 space-y-3">
-          <span class="text-xs font-bold tracking-widest uppercase text-pink-600">Our Collections</span>
-          <h1 class="text-4xl font-serif text-[#1F0D1C]">Shop All Products</h1>
-          <p class="text-gray-500 text-sm leading-relaxed">
+          <span class="text-xs font-bold tracking-widest uppercase text-primary">Our Collections</span>
+          <h1 class="text-4xl font-serif text-text">Shop All Products</h1>
+          <p class="text-muted text-sm leading-relaxed">
             Explore our handpicked selection of clean cosmetics, non-toxic formulations, and imported authentic Korean skincare.
           </p>
         </div>
   
-        <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-8">
+        <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-outline/50 mb-8">
           <button 
             @click="isMobileFilterOpen = true" 
-            class="lg:hidden flex items-center gap-2 text-sm font-semibold text-[#1F0D1C] px-3 py-2 border border-gray-200 rounded-lg"
+            class="lg:hidden flex items-center gap-2 text-sm font-semibold text-text px-3 py-2 border border-outline rounded-lg"
           >
-            <Icon name="heroicons:funnel" class="w-4 h-4 text-pink-600" />
+            <Icon name="heroicons:funnel" class="w-4 h-4 text-primary" />
             Filters
           </button>
           
-          <p class="text-xs md:text-sm text-gray-500 hidden sm:block">
-            Showing <span class="font-bold text-gray-800">{{ filteredProducts.length }}</span> products
+          <p class="text-xs md:text-sm text-muted hidden sm:block">
+            Showing <span class="font-bold text-text">{{ filteredProducts.length }}</span> products
           </p>
   
           <div class="flex items-center gap-2">
-            <label class="text-xs text-gray-400 uppercase tracking-wider font-semibold hidden md:block">Sort By:</label>
+            <label class="text-xs text-muted/70 uppercase tracking-wider font-semibold hidden md:block">Sort By:</label>
             <select 
               v-model="sortBy"
-              class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500 transition-colors"
+              class="bg-background border border-outline text-muted text-sm rounded-lg px-3 py-2 outline-none focus:border-primary transition-colors"
             >
               <option value="featured">Featured</option>
               <option value="price-low">Price: Low to High</option>
@@ -38,16 +38,16 @@
   
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          <aside class="hidden lg:block lg:col-span-3 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-8 sticky top-32">
+          <aside class="hidden lg:block lg:col-span-3 bg-white p-6 rounded-2xl border border-outline/50 shadow-sm space-y-8 sticky top-32">
             <div class="space-y-3">
-              <h3 class="text-sm font-bold uppercase tracking-wider text-[#1F0D1C] pb-2 border-b border-gray-100">Categories</h3>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-text pb-2 border-b border-outline/50">Categories</h3>
               <div class="space-y-2">
-                <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:text-pink-600 transition-colors">
+                <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 text-sm text-muted cursor-pointer hover:text-primary transition-colors">
                   <input 
                     type="checkbox" 
                     :value="cat" 
                     v-model="selectedCategories"
-                    class="rounded text-pink-600 focus:ring-pink-500 w-4 h-4 border-gray-300"
+                    class="rounded text-primary focus:ring-primary w-4 h-4 border-outline"
                   />
                   {{ cat }}
                 </label>
@@ -55,7 +55,7 @@
             </div>
   
             <div class="space-y-3">
-              <h3 class="text-sm font-bold uppercase tracking-wider text-[#1F0D1C] pb-2 border-b border-gray-100">Max Price</h3>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-text pb-2 border-b border-outline/50">Max Price</h3>
               <div class="space-y-2">
                 <input 
                   type="range" 
@@ -63,33 +63,33 @@
                   max="1500" 
                   step="50"
                   v-model="maxPrice"
-                  class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-pink-600"
+                  class="w-full h-1.5 bg-outline/50 rounded-lg appearance-none cursor-pointer accent-primary"
                 />
-                <div class="flex justify-between text-xs font-bold text-gray-700">
+                <div class="flex justify-between text-xs font-bold text-muted">
                   <span>0 EGP</span>
-                  <span class="text-pink-600 px-2 py-0.5 bg-pink-50 rounded">{{ maxPrice }} EGP</span>
+                  <span class="text-primary px-2 py-0.5 bg-primary/10 rounded">{{ maxPrice }} EGP</span>
                 </div>
               </div>
             </div>
           </aside>
   
           <div class="lg:col-span-9">
-            <div v-if="filteredProducts.length === 0" class="text-center py-24 bg-white rounded-2xl border border-gray-100">
-              <Icon name="heroicons:circle-stack" class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p class="text-gray-500 text-lg">No products match your filter selections.</p>
+            <div v-if="filteredProducts.length === 0" class="text-center py-24 bg-white rounded-2xl border border-outline/50">
+              <Icon name="heroicons:circle-stack" class="w-12 h-12 text-outline mx-auto mb-3" />
+              <p class="text-muted text-lg">No products match your filter selections.</p>
             </div>
   
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
               <div 
                 v-for="product in filteredProducts" 
                 :key="product.id" 
-                class="flex flex-col group relative bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-xl hover:border-pink-100 transition-all duration-300"
+                class="flex flex-col group relative bg-white rounded-xl p-3 border border-outline/50 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
-                <NuxtLink :to="`/products/${product.id}`" class="relative aspect-[4/5] w-full bg-gray-50/50 rounded-lg overflow-hidden flex items-center justify-center p-4 cursor-pointer block">
-                  <span v-if="product.onSale" class="absolute top-2 left-2 bg-[#421A3B] text-white text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider rounded-sm z-10">
+                <NuxtLink :to="`/products/${product.id}`" class="relative aspect-[4/5] w-full bg-background/50 rounded-lg overflow-hidden flex items-center justify-center p-4 cursor-pointer block">
+                  <span v-if="product.onSale" class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider rounded-sm z-10">
                     Sale
                   </span>
-                  <span v-if="product.category === 'Korean Care'" class="absolute top-2 right-2 bg-teal-600 text-white text-[9px] font-extrabold px-2 py-0.5 uppercase rounded-sm z-10">
+                  <span v-if="product.category === 'Korean Care'" class="absolute top-2 right-2 bg-secondary text-white text-[9px] font-extrabold px-2 py-0.5 uppercase rounded-sm z-10">
                     K-Beauty
                   </span>
                   <img 
@@ -101,10 +101,10 @@
                 </NuxtLink>
   
                 <div class="flex flex-col pt-4 flex-1 space-y-2">
-                  <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{{ product.category }}</span>
+                  <span class="text-[10px] uppercase font-bold text-muted/70 tracking-wider">{{ product.category }}</span>
                   
                   <NuxtLink :to="`/products/${product.id}`" class="block">
-                    <h2 class="text-sm font-semibold text-gray-800 line-clamp-2 min-h-[40px] hover:text-pink-600 transition-colors cursor-pointer">
+                    <h2 class="text-sm font-semibold text-text line-clamp-2 min-h-[40px] hover:text-primary transition-colors cursor-pointer">
                       {{ product.name }}
                     </h2>
                   </NuxtLink>
@@ -114,16 +114,16 @@
                   </div>
   
                   <div class="flex items-center gap-2 pt-1 font-bold text-xs sm:text-sm">
-                    <span v-if="product.oldPrice" class="text-gray-400 line-through font-normal">
+                    <span v-if="product.oldPrice" class="text-muted/70 line-through font-normal">
                       {{ product.oldPrice }} EGP
                     </span>
-                    <span class="bg-[#FFFCE4] text-[#2D1B2D] px-2 py-0.5 rounded">
+                    <span class="bg-surface text-text border border-outline/50 px-2 py-0.5 rounded">
                       {{ product.price }} EGP
                     </span>
                   </div>
   
                   <div class="pt-3">
-                    <button class="w-full bg-[#1F0D1C] hover:bg-pink-600 text-white text-[11px] uppercase font-bold py-3 tracking-widest transition-colors duration-300 rounded-lg shadow-sm">
+                    <button class="w-full bg-dark hover:bg-primary text-white text-[11px] uppercase font-bold py-3 tracking-widest transition-colors duration-300 rounded-lg shadow-sm">
                       Add to Bag
                     </button>
                   </div>
@@ -141,27 +141,27 @@
   
       <Transition name="slide">
         <aside v-if="isMobileFilterOpen" class="fixed top-0 left-0 h-full w-[290px] bg-white z-[120] shadow-xl lg:hidden flex flex-col p-6" dir="ltr">
-          <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-            <h2 class="text-lg font-bold text-[#1F0D1C]">Filter Products</h2>
-            <button @click="isMobileFilterOpen = false" class="p-1.5 bg-gray-100 hover:bg-pink-50 hover:text-pink-600 rounded-full transition-colors">
+          <div class="flex items-center justify-between pb-4 border-b border-outline/50 mb-6">
+            <h2 class="text-lg font-bold text-text">Filter Products</h2>
+            <button @click="isMobileFilterOpen = false" class="p-1.5 bg-background hover:bg-primary/10 hover:text-primary rounded-full transition-colors">
               <Icon name="heroicons:x-mark" class="w-5 h-5" />
             </button>
           </div>
           
           <div class="space-y-6 flex-1 overflow-y-auto">
             <div class="space-y-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Categories</h3>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-muted/70">Categories</h3>
               <div class="space-y-2">
-                <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 text-sm text-gray-600">
-                  <input type="checkbox" :value="cat" v-model="selectedCategories" class="rounded text-pink-600 focus:ring-pink-500 w-4 h-4 border-gray-300" />
+                <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 text-sm text-muted">
+                  <input type="checkbox" :value="cat" v-model="selectedCategories" class="rounded text-primary focus:ring-primary w-4 h-4 border-outline" />
                   {{ cat }}
                 </label>
               </div>
             </div>
             <div class="space-y-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Max Price</h3>
-              <input type="range" min="0" max="1500" step="50" v-model="maxPrice" class="w-full appearance-none h-1 bg-gray-200 rounded accent-pink-600" />
-              <div class="text-xs font-bold text-pink-600">{{ maxPrice }} EGP</div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-muted/70">Max Price</h3>
+              <input type="range" min="0" max="1500" step="50" v-model="maxPrice" class="w-full appearance-none h-1 bg-outline/50 rounded accent-primary" />
+              <div class="text-xs font-bold text-primary">{{ maxPrice }} EGP</div>
             </div>
           </div>
         </aside>

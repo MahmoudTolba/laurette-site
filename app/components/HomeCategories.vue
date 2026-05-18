@@ -4,8 +4,8 @@
         
         <!-- العنوان الرئيسي -->
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">تسوقي حسب الفئة</h2>
-          <div class="w-20 h-1.5 bg-gradient-to-l from-purple-800 to-pink-500 mx-auto rounded-full"></div>
+          <h2 class="text-3xl md:text-4xl font-bold text-text mb-2">تسوقي حسب الفئة</h2>
+          <div class="w-20 h-1.5 bg-gradient-to-l from-secondary to-primary mx-auto rounded-full"></div>
         </div>
   
         <!-- شبكة التصنيفات -->
@@ -17,7 +17,7 @@
             class="group flex flex-col items-center"
           >
             <!-- الدائرة الحاضنة للصورة -->
-            <div class="relative aspect-square w-full max-w-[260px] rounded-full overflow-hidden border-4 border-white shadow-md group-hover:shadow-2xl group-hover:border-pink-200 transition-all duration-500 transform group-hover:-translate-y-2">
+            <div class="relative aspect-square w-full max-w-[260px] rounded-full overflow-hidden border-4 border-white shadow-md group-hover:shadow-2xl group-hover:border-primary/30 transition-all duration-500 transform group-hover:-translate-y-2">
               
               <!-- الصورة المختارة بعناية لتناسب الفئة -->
               <img 
