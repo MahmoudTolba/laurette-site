@@ -14,5 +14,10 @@ export default defineNuxtConfig({
   },
 
 
-  modules: ['@nuxt/icon', '@nuxtjs/tailwindcss', '@primevue/nuxt-module'],
+  modules: [
+    '@nuxt/icon',
+    '@nuxtjs/tailwindcss',
+    '@primevue/nuxt-module',
+    '@pinia/nuxt',
+  ],
 })

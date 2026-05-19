@@ -84,7 +84,7 @@
   
               <button 
                 @click="addToCart"
-                class="flex-1 bg-dark hover:bg-primary text-white font-bold text-sm uppercase tracking-widest py-4 px-8 rounded-full shadow-lg hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3"
+                class="flex-1 bg-dark hover:bg-primary text-white font-bold text-sm uppercase tracking-widest py-4 px-8 rounded-full shadow-lg hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 active:scale-95"
               >
                 <Icon name="uil:shopping-bag" class="w-5 h-5" />
                 Add to Bag
@@ -131,6 +131,9 @@
   const quantity = ref(1);
   const activeImage = ref('');
   const activeTab = ref('desc');
+  
+  // 🔵 استدعاء نفس السلة المشتركة (Shared Cart State) ليسمع فيها التحديث فوراً
+  const cart = useState('cart', () => []);
   
   const tabs = [
     { id: 'desc', name: 'Description' },
@@ -183,11 +186,33 @@
     ];
   });
   
+  // 🔵 تحديث دالة الإضافة لتعديل عدد المنتجات الحقيقي داخل الـ State المشترك
   const addToCart = () => {
-    alert(`Added ${quantity.value} unit(s) of "${product.value.name}" straight to your bag!`);
+    if (!product.value) return;
+  
+    const existingProduct = cart.value.find(item => item.id === product.value.id);
+    
+    if (existingProduct) {
+      // زيادة الكمية بناءً على العدد الذي حدده المستخدم من العداد
+      existingProduct.quantity += quantity.value;
+    } else {
+      // إضافة منتج جديد بالكمية المحددة
+      cart.value.push({ ...product.value, quantity: quantity.value });
+    }
+  
+    // اختياري: إعادة تعيين العداد إلى 1 بعد الإضافة الناجحة
+    quantity.value = 1;
   };
   
   useHead({
     title: product.value ? `${product.value.name} | Laurette Store` : 'Product Details'
   });
   </script>
+  
+  <style scoped>
+  .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; }
+  
+  .slide-enter-active, .slide-leave-active { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .slide-enter-from, .slide-leave-to { transform: translateX(-100%); }
+  </style>

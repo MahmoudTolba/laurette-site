@@ -109,8 +109,11 @@
               >
                 <Icon name="uil:shopping-cart" class="w-6 h-6" />
               </button>
-              <span class="absolute -top-1 -right-1 bg-gradient-to-tr from-secondary to-primary text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center border-2 border-transparent shadow-sm font-bold animate-pulse-slow">
-                0
+              <span 
+                v-if="cartCount > 0"
+                class="absolute -top-1 -right-1 bg-gradient-to-tr from-secondary to-primary text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center border-2 border-transparent shadow-sm font-bold animate-pulse-slow"
+              >
+                {{ cartCount }}
               </span>
             </div>
           </div>
@@ -162,6 +165,14 @@
   const searchQuery = ref('')
   
   const isHomePage = computed(() => route.path === '/')
+  
+  // 🔵 استدعاء نفس الحالة المشتركة للسلة (Shared Cart State) ليقرأ منها الهيدر مباشرة
+  const cart = useState('cart', () => [])
+  
+  // 🔵 حساب إجمالي عدد القطع في السلة ديناميكياً بناءً على كمية كل منتج
+  const cartCount = computed(() => {
+    return cart.value.reduce((total, item) => total + (item.quantity || 0), 0)
+  })
   
   // نفس قاعدة بيانات المنتجات (Mock Data) للبحث المطابق بداخلها فوريّاً
   const productsMockDatabase = [

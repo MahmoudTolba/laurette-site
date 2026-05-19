@@ -14,7 +14,7 @@
 
             <NuxtLink to="/" class="inline-block transform hover:scale-105 transition-transform">
 
-              <img src="~/assets/images/logo.png" alt="Laurette Store" class="h-14 w-auto brightness-0 invert" />
+              <img src="~/assets/images/logo.png" alt="Laurette Store" class="h-14 w-auto " />
 
             </NuxtLink>
 

@@ -77,8 +77,8 @@
             </div>
           </aside>
   
-          <div class="lg:col-span-9">
-            <div v-if="filteredProducts.length === 0" class="text-center py-24 bg-white rounded-2xl border border-outline/50">
+          <div class="lg:col-span-9 space-y-10">
+            <div v-if="paginatedProducts.length === 0" class="text-center py-24 bg-white rounded-2xl border border-outline/50">
               <Icon name="heroicons:circle-stack" class="w-12 h-12 text-outline mx-auto mb-3" />
               <p class="text-muted text-lg">No products match your search or filter selections.</p>
               <button v-if="route.query.search" @click="clearSearch" class="mt-4 text-xs font-bold text-primary underline hover:text-text transition-colors">
@@ -88,7 +88,7 @@
   
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
               <div 
-                v-for="product in filteredProducts" 
+                v-for="product in paginatedProducts" 
                 :key="product.id" 
                 class="flex flex-col group relative bg-white rounded-xl p-3 border border-outline/50 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
@@ -130,12 +130,45 @@
                   </div>
   
                   <div class="pt-3">
-                    <button class="w-full bg-dark hover:bg-primary text-white text-[11px] uppercase font-bold py-3 tracking-widest transition-colors duration-300 rounded-lg shadow-sm">
+                    <button 
+                      @click="addToCart(product)"
+                      class="w-full bg-dark hover:bg-primary text-white text-[11px] uppercase font-bold py-3 tracking-widest transition-all duration-300 rounded-lg shadow-sm active:scale-95"
+                    >
                       Add to Bag
                     </button>
                   </div>
                 </div>
               </div>
+            </div>
+  
+            <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 pt-6 border-t border-outline/30">
+              <button 
+                @click="prevPage" 
+                :disabled="currentPage === 1"
+                class="flex items-center justify-center w-9 h-9 rounded-xl border border-outline transition-all disabled:opacity-40 disabled:hover:bg-transparent hover:bg-primary/5 hover:border-primary group"
+              >
+                <Icon name="heroicons:chevron-left" class="w-4 h-4 text-text group-hover:text-primary" />
+              </button>
+  
+              <button 
+                v-for="page in totalPages" 
+                :key="page"
+                @click="setPage(page)"
+                class="w-9 h-9 rounded-xl font-semibold text-sm transition-all border"
+                :class="currentPage === page 
+                  ? 'bg-primary border-primary text-white shadow-md shadow-primary/20' 
+                  : 'bg-white border-outline text-muted hover:border-primary hover:text-primary'"
+              >
+                {{ page }}
+              </button>
+  
+              <button 
+                @click="nextPage" 
+                :disabled="currentPage === totalPages"
+                class="flex items-center justify-center w-9 h-9 rounded-xl border border-outline transition-all disabled:opacity-40 disabled:hover:bg-transparent hover:bg-primary/5 hover:border-primary group"
+              >
+                <Icon name="heroicons:chevron-right" class="w-4 h-4 text-text group-hover:text-primary" />
+              </button>
             </div>
           </div>
   
@@ -185,6 +218,13 @@
   const maxPrice = ref(1500);
   const selectedCategories = ref([]);
   
+  // متغيرات نظام الباجينيشن (Pagination State)
+  const currentPage = ref(1);
+  const itemsPerPage = ref(8); // عدد المنتجات في كل صفحة
+  
+  // 🔵 تهيئة السلة كـ حالة مشتركة (Shared State) ليتعرف عليها الهيدر تلقائياً
+  const cart = useState('cart', () => []);
+  
   const categories = ['Skin Care', 'Body Care', 'Hair Care', 'Korean Care', 'Make Up'];
   
   const products = [
@@ -193,27 +233,38 @@
     { id: 3, name: 'Soralone Hydra Cream Gel 100ml Offer (1+1)', category: 'Korean Care', price: 275, oldPrice: 550, onSale: true, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=400' },
     { id: 4, name: 'Soralone Cica Cream Gel 60ml Offer (1+1)', category: 'Korean Care', price: 295, oldPrice: 590, onSale: true, image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=400' },
     { id: 5, name: 'Capixy Intense Tonic Spray Offer (1+1)', category: 'Hair Care', price: 700, oldPrice: 1400, onSale: true, image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?q=80&w=400' },
-    { id: 6, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' }
+    { id: 6, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 7, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 8, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 9, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 10, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 11, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 12, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 13, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 14, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 15, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 16, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 17, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 18, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 19, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
+    { id: 20, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' }
   ];
   
+  // 1. الفلترة الأساسية (تتأثر بالبحث، والأقسام، والأسعار)
   const filteredProducts = computed(() => {
     let result = [...products];
   
-    // 1. الفلترة بكلمة البحث الممررة من الهيدر (إن وجدت في الرابط)
     if (route.query.search) {
       const searchWord = route.query.search.toString().toLowerCase();
       result = result.filter(p => p.name.toLowerCase().includes(searchWord));
     }
   
-    // 2. الفلترة بحد السعر الأقصى
     result = result.filter(p => p.price <= maxPrice.value);
   
-    // 3. الفلترة بالأقسام المختارة
     if (selectedCategories.value.length > 0) {
       result = result.filter(p => selectedCategories.value.includes(p.category));
     }
   
-    // 4. الترتيب حسب السعر
     if (sortBy.value === 'price-low') {
       result.sort((a, b) => a.price - b.price);
     } else if (sortBy.value === 'price-high') {
@@ -223,7 +274,53 @@
     return result;
   });
   
-  // دالة لتنظيف كلمة البحث والعودة لرؤية كافة المنتجات بسهولة
+  // 2. حساب إجمالي عدد الصفحات بناءً على المنتجات المفلترة
+  const totalPages = computed(() => {
+    return Math.ceil(filteredProducts.value.length / itemsPerPage.value);
+  });
+  
+  // 3. المنتجات التي ستعرض في الصفحة الحالية فقط بعد التقطيع (Slice)
+  const paginatedProducts = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredProducts.value.slice(start, end);
+  });
+  
+  // 🔵 دالة إضافة المنتج إلى السلة وزيادة الكمية إذا كان مكرراً
+  const addToCart = (product) => {
+    const existingProduct = cart.value.find(item => item.id === product.id);
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      cart.value.push({ ...product, quantity: 1 });
+    }
+  };
+  
+  // مراقبة أي تغيير في الفلاتر أو السعر أو البحث لإرجاع المستخدم للصفحة 1 فوراً
+  watch([selectedCategories, maxPrice, sortBy, () => route.query.search], () => {
+    currentPage.value = 1;
+  });
+  
+  // دالات التحكم في الصفحات (Pagination Actions)
+  const setPage = (page) => {
+    currentPage.value = page;
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // صعود سلس لأعلى الصفحة عند الانتقال
+  };
+  
+  const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+      currentPage.value++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage.value > 1) {
+      currentPage.value--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  
   const clearSearch = () => {
     router.push({ path: '/products', query: { ...route.query, search: undefined } });
   };
