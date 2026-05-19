@@ -62,12 +62,12 @@
     { 
       name: 'قسم الأطفال', 
       image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop', 
-      url: '/category/kids' 
+      url: '/category/baby-care' 
     },
     { 
       name: 'المنتجات الكورية', 
       image: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=600&auto=format&fit=crop', 
-      url: '/category/korean' 
+      url: '/category/korean-care' 
     },
     { 
       name: 'المكياج', 

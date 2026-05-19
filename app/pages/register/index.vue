@@ -38,8 +38,9 @@
                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
                   <Icon name="heroicons:user" class="w-5 h-5" />
                 </span>
-                <input 
-                  type="text" 
+                <input
+                  v-model="fullName"
+                  type="text"
                   required
                   placeholder="أدخلِ اسمكِ الكامل"
                   class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl pl-4 pr-11 py-3.5 outline-none focus:border-pink-500 focus:bg-white transition-all text-right"
@@ -53,8 +54,9 @@
                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
                   <Icon name="heroicons:envelope" class="w-5 h-5" />
                 </span>
-                <input 
-                  type="email" 
+                <input
+                  v-model="email"
+                  type="email"
                   required
                   placeholder="yourname@example.com"
                   class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl pl-4 pr-11 py-3.5 outline-none focus:border-pink-500 focus:bg-white transition-all text-left"
@@ -68,8 +70,9 @@
                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
                   <Icon name="heroicons:lock-closed" class="w-5 h-5" />
                 </span>
-                <input 
-                  type="password" 
+                <input
+                  v-model="password"
+                  type="password"
                   required
                   placeholder="••••••••"
                   class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl pl-4 pr-11 py-3.5 outline-none focus:border-pink-500 focus:bg-white transition-all text-left"
@@ -110,8 +113,27 @@
   </template>
   
   <script setup>
-  const handleRegister = () => {
-    alert('تهانينا! تم إنشاء حسابكِ بنجاح في متجر لوريت وجاري تحضير روتينك الخاص.');
+  const auth = useAuthStore()
+  const router = useRouter()
+
+  const fullName = ref('')
+  const email = ref('')
+  const password = ref('')
+
+  const REGISTERED_USERS_KEY = 'laurette-users'
+
+  const handleRegister = async () => {
+    const normalizedEmail = email.value.trim().toLowerCase()
+    const users = JSON.parse(localStorage.getItem(REGISTERED_USERS_KEY) || '{}')
+
+    users[normalizedEmail] = {
+      name: fullName.value.trim(),
+      password: password.value,
+    }
+
+    localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(users))
+    auth.login({ name: fullName.value.trim(), email: normalizedEmail })
+    await router.push('/')
   };
   
   useHead({

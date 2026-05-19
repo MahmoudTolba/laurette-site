@@ -146,7 +146,7 @@
     {
       id: '1',
       name: 'Topface Instyle Creamy Lipstick 001.',
-      category: 'Make Up',
+      category: 'Makeup',
       price: 188,
       oldPrice: 375,
       onSale: true,

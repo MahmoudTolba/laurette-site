@@ -210,7 +210,7 @@
 
     { name: 'Hair Care', path: '/category/hair-care' },
 
-    { name: 'Korean Cosmetics', path: '/korean' },
+    { name: 'Korean Cosmetics', path: '/category/korean-care' },
 
     { name: 'Makeup Set', path: '/category/makeup' },
 

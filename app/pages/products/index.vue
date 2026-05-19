@@ -8,9 +8,16 @@
           <p class="text-muted text-sm leading-relaxed">
             Explore our handpicked selection of clean cosmetics, non-toxic formulations, and imported authentic Korean skincare.
           </p>
-          <div v-if="route.query.search" class="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full mt-2">
-            <span>Search results for: "{{ route.query.search }}"</span>
-            <button @click="clearSearch" class="hover:text-text transition-colors font-extrabold ml-1">✕</button>
+          
+          <div class="flex flex-wrap justify-center gap-2 mt-2">
+            <div v-if="route.query.search" class="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full">
+              <span>Search: "{{ route.query.search }}"</span>
+              <button @click="clearSearch" class="hover:text-text transition-colors font-extrabold ml-1">✕</button>
+            </div>
+            <div v-if="route.query.category" class="inline-flex items-center gap-2 bg-secondary/10 text-secondary text-xs font-bold px-3 py-1.5 rounded-full">
+              <span>Category: {{ translateSlugToName(route.query.category) }}</span>
+              <button @click="clearCategoryQuery" class="hover:text-text transition-colors font-extrabold ml-1">✕</button>
+            </div>
           </div>
         </div>
   
@@ -81,8 +88,8 @@
             <div v-if="paginatedProducts.length === 0" class="text-center py-24 bg-white rounded-2xl border border-outline/50">
               <Icon name="heroicons:circle-stack" class="w-12 h-12 text-outline mx-auto mb-3" />
               <p class="text-muted text-lg">No products match your search or filter selections.</p>
-              <button v-if="route.query.search" @click="clearSearch" class="mt-4 text-xs font-bold text-primary underline hover:text-text transition-colors">
-                Clear search query and view all
+              <button v-if="route.query.search || route.query.category" @click="resetAllFilters" class="mt-4 text-xs font-bold text-primary underline hover:text-text transition-colors">
+                Clear all filters and view all
               </button>
             </div>
   
@@ -218,39 +225,39 @@
   const maxPrice = ref(1500);
   const selectedCategories = ref([]);
   
-  // متغيرات نظام الباجينيشن (Pagination State)
   const currentPage = ref(1);
-  const itemsPerPage = ref(8); // عدد المنتجات في كل صفحة
+  const itemsPerPage = ref(8);
   
-  // 🔵 تهيئة السلة كـ حالة مشتركة (Shared State) ليتعرف عليها الهيدر تلقائياً
   const cart = useState('cart', () => []);
   
-  const categories = ['Skin Care', 'Body Care', 'Hair Care', 'Korean Care', 'Make Up'];
+  const categories = ['Skin Care', 'Body Care', 'Hair Care', 'Korean Care', 'Makeup', 'Baby Care'];
   
-  const products = [
-    { id: 1, name: 'Topface Instyle Creamy Lipstick 001.', category: 'Make Up', price: 188, oldPrice: 375, onSale: true, image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=400' },
-    { id: 2, name: 'Topface Micellar Cleansing Water 150 ml.', category: 'Skin Care', price: 193, oldPrice: 385, onSale: true, image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=400' },
-    { id: 3, name: 'Soralone Hydra Cream Gel 100ml Offer (1+1)', category: 'Korean Care', price: 275, oldPrice: 550, onSale: true, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=400' },
-    { id: 4, name: 'Soralone Cica Cream Gel 60ml Offer (1+1)', category: 'Korean Care', price: 295, oldPrice: 590, onSale: true, image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=400' },
-    { id: 5, name: 'Capixy Intense Tonic Spray Offer (1+1)', category: 'Hair Care', price: 700, oldPrice: 1400, onSale: true, image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?q=80&w=400' },
-    { id: 6, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 7, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 8, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 9, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 10, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 11, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 12, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 13, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 14, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 15, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 16, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 17, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 18, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 19, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' },
-    { id: 20, name: 'Luxury Rose Treatment Facial Oil', category: 'Skin Care', price: 450, oldPrice: null, onSale: false, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=400' }
-  ];
+  const { products } = useProducts()
+
+  const translateSlugToName = (slug) => slugToCategoryName(String(slug))
   
-  // 1. الفلترة الأساسية (تتأثر بالبحث، والأقسام، والأسعار)
+  // 🟢 التحديث الثاني: المراقبة الذكية للرابط لاستيعاب الـ Slugs الجديدة بشكل صحيح بالخلفية
+  watch(
+    () => route.query.category,
+    (newCategorySlug) => {
+      if (newCategorySlug && CATEGORY_SLUG_MAP[newCategorySlug]) {
+        const targetCategory = CATEGORY_SLUG_MAP[newCategorySlug];
+        if (!selectedCategories.value.includes(targetCategory)) {
+          selectedCategories.value = [targetCategory];
+        }
+      } else if (!newCategorySlug) {
+        selectedCategories.value = [];
+      }
+    },
+    { immediate: true }
+  );
+  
+  watch(selectedCategories, (newVal) => {
+    if (newVal.length === 0 && route.query.category) {
+      router.push({ path: '/products', query: { ...route.query, category: undefined } });
+    }
+  });
+  
   const filteredProducts = computed(() => {
     let result = [...products];
   
@@ -274,19 +281,16 @@
     return result;
   });
   
-  // 2. حساب إجمالي عدد الصفحات بناءً على المنتجات المفلترة
   const totalPages = computed(() => {
     return Math.ceil(filteredProducts.value.length / itemsPerPage.value);
   });
   
-  // 3. المنتجات التي ستعرض في الصفحة الحالية فقط بعد التقطيع (Slice)
   const paginatedProducts = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
     return filteredProducts.value.slice(start, end);
   });
   
-  // 🔵 دالة إضافة المنتج إلى السلة وزيادة الكمية إذا كان مكرراً
   const addToCart = (product) => {
     const existingProduct = cart.value.find(item => item.id === product.id);
     if (existingProduct) {
@@ -296,15 +300,13 @@
     }
   };
   
-  // مراقبة أي تغيير في الفلاتر أو السعر أو البحث لإرجاع المستخدم للصفحة 1 فوراً
   watch([selectedCategories, maxPrice, sortBy, () => route.query.search], () => {
     currentPage.value = 1;
   });
   
-  // دالات التحكم في الصفحات (Pagination Actions)
   const setPage = (page) => {
     currentPage.value = page;
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // صعود سلس لأعلى الصفحة عند الانتقال
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   const nextPage = () => {
@@ -323,6 +325,17 @@
   
   const clearSearch = () => {
     router.push({ path: '/products', query: { ...route.query, search: undefined } });
+  };
+  
+  const clearCategoryQuery = () => {
+    router.push({ path: '/products', query: { ...route.query, category: undefined } });
+    selectedCategories.value = [];
+  };
+  
+  const resetAllFilters = () => {
+    maxPrice.value = 1500;
+    selectedCategories.value = [];
+    router.push({ path: '/products', query: {} });
   };
   
   useHead({

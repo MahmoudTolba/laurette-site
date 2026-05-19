@@ -93,7 +93,24 @@
               <Icon name="uil:search" class="w-6 h-6" />
             </button>
   
+            <div v-if="auth.isLoggedIn" class="hidden sm:flex items-center gap-2">
+              <span
+                class="text-xs font-semibold max-w-[120px] truncate"
+                :class="isHomePage ? 'text-white' : 'text-text'"
+              >
+                Hi, {{ auth.displayName }}
+              </span>
+              <button
+                @click="handleLogout"
+                class="p-2 rounded-full transition-all group"
+                :class="isHomePage ? 'hover:bg-white/10 text-white hover:text-primary' : 'hover:bg-primary/10 text-text hover:text-primary'"
+                title="Logout"
+              >
+                <Icon name="uil:sign-out-alt" class="w-6 h-6" />
+              </button>
+            </div>
             <button
+              v-else
               @click="navigateTo('/login')"
               class="p-2 rounded-full transition-all group"
               :class="isHomePage ? 'hover:bg-white/10 text-white hover:text-primary' : 'hover:bg-primary/10 text-text hover:text-primary'"
@@ -148,8 +165,22 @@
             </NuxtLink>
           </nav>
   
-          <div class="mt-auto p-6 border-t border-outline/30">
-            <button @click="isMenuOpen = false; navigateTo('/login')" class="w-full bg-gradient-to-r from-secondary to-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/20">
+          <div class="mt-auto p-6 border-t border-outline/30 space-y-3">
+            <p v-if="auth.isLoggedIn" class="text-sm font-semibold text-text text-center">
+              Welcome, {{ auth.displayName }}
+            </p>
+            <button
+              v-if="auth.isLoggedIn"
+              @click="isMenuOpen = false; handleLogout()"
+              class="w-full border border-outline text-text py-3 rounded-xl font-bold hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              Logout
+            </button>
+            <button
+              v-else
+              @click="isMenuOpen = false; navigateTo('/login')"
+              class="w-full bg-gradient-to-r from-secondary to-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/20"
+            >
               Login / Sign Up
             </button>
           </div>
@@ -161,8 +192,14 @@
   <script setup>
   const route = useRoute()
   const router = useRouter()
+  const auth = useAuthStore()
   const isMenuOpen = ref(false)
   const searchQuery = ref('')
+
+  const handleLogout = () => {
+    auth.logout()
+    navigateTo('/')
+  }
   
   const isHomePage = computed(() => route.path === '/')
   
@@ -203,8 +240,8 @@
   const navLinks = [
     { name: 'Home', path: '/', icon: 'uil:home' },
     { name: 'Products', path: '/products', icon: 'uil:box' },
-    { name: 'Korean Care', path: '/korean', icon: 'uil:star' },
-    { name: 'Make Up', path: '/makeup', icon: 'uil:brush-alt' },
+    // { name: 'Korean Care', path: '/korean', icon: 'uil:star' },
+    { name: 'Make Up', path: '/category/makeup', icon: 'uil:brush-alt' },
     { name: 'Routines', path: '/routines', icon: 'uil:schedule' },
     { name: 'About Us', path: '/about', icon: 'uil:info-circle' },
     { name: 'Contact Us', path: '/ContactUs', icon: 'uil:envelope' },
