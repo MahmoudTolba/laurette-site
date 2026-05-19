@@ -174,7 +174,7 @@
 
           
 
-          <div class="flex items-center space-x-3 filter grayscale opacity-60 hover:opacity-100 transition-opacity duration-300">
+          <!-- <div class="flex items-center space-x-3 filter grayscale opacity-60 hover:opacity-100 transition-opacity duration-300">
 
             <Icon name="logos:visa" class="w-10 h-6 object-contain" />
 
@@ -182,7 +182,7 @@
 
             <Icon name="fa6-solid:money-bill-wave" class="w-6 h-6 text-primary object-contain" title="Cash on Delivery" />
 
-          </div>
+          </div> -->
 
         </div>
 

@@ -1,8 +1,9 @@
 <template>
   <div class="bg-background min-h-screen">
-    <AppHeader />
-    <NuxtPage />
-    <AppFooter />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    
   </div>
 </template>
 <script setup>
