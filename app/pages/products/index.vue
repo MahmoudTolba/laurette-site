@@ -8,6 +8,10 @@
           <p class="text-muted text-sm leading-relaxed">
             Explore our handpicked selection of clean cosmetics, non-toxic formulations, and imported authentic Korean skincare.
           </p>
+          <div v-if="route.query.search" class="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full mt-2">
+            <span>Search results for: "{{ route.query.search }}"</span>
+            <button @click="clearSearch" class="hover:text-text transition-colors font-extrabold ml-1">✕</button>
+          </div>
         </div>
   
         <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-outline/50 mb-8">
@@ -76,7 +80,10 @@
           <div class="lg:col-span-9">
             <div v-if="filteredProducts.length === 0" class="text-center py-24 bg-white rounded-2xl border border-outline/50">
               <Icon name="heroicons:circle-stack" class="w-12 h-12 text-outline mx-auto mb-3" />
-              <p class="text-muted text-lg">No products match your filter selections.</p>
+              <p class="text-muted text-lg">No products match your search or filter selections.</p>
+              <button v-if="route.query.search" @click="clearSearch" class="mt-4 text-xs font-bold text-primary underline hover:text-text transition-colors">
+                Clear search query and view all
+              </button>
             </div>
   
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -170,6 +177,9 @@
   </template>
   
   <script setup>
+  const route = useRoute();
+  const router = useRouter();
+  
   const isMobileFilterOpen = ref(false);
   const sortBy = ref('featured');
   const maxPrice = ref(1500);
@@ -189,12 +199,21 @@
   const filteredProducts = computed(() => {
     let result = [...products];
   
+    // 1. الفلترة بكلمة البحث الممررة من الهيدر (إن وجدت في الرابط)
+    if (route.query.search) {
+      const searchWord = route.query.search.toString().toLowerCase();
+      result = result.filter(p => p.name.toLowerCase().includes(searchWord));
+    }
+  
+    // 2. الفلترة بحد السعر الأقصى
     result = result.filter(p => p.price <= maxPrice.value);
   
+    // 3. الفلترة بالأقسام المختارة
     if (selectedCategories.value.length > 0) {
       result = result.filter(p => selectedCategories.value.includes(p.category));
     }
   
+    // 4. الترتيب حسب السعر
     if (sortBy.value === 'price-low') {
       result.sort((a, b) => a.price - b.price);
     } else if (sortBy.value === 'price-high') {
@@ -203,6 +222,11 @@
   
     return result;
   });
+  
+  // دالة لتنظيف كلمة البحث والعودة لرؤية كافة المنتجات بسهولة
+  const clearSearch = () => {
+    router.push({ path: '/products', query: { ...route.query, search: undefined } });
+  };
   
   useHead({
     title: 'Shop Clean Beauty & Skincare | Laurette Store'

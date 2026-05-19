@@ -3,7 +3,7 @@
       
       <section class="container mx-auto px-4 max-w-6xl mb-16 md:mb-24 relative z-10">
         <div class="text-center max-w-2xl mx-auto space-y-4">
-          <span class="text-xs font-bold tracking-widest uppercase text-primary animate-pulse-slow block">Our Story</span>
+          <span class="text-3xl font-bold tracking-widest uppercase text-primary animate-pulse-slow block">Our Story</span>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif text-text leading-tight tracking-tight">
             Redefining Beauty Through Clean Science
           </h1>
@@ -71,7 +71,7 @@
         </div>
   
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="text-center p-6 space-y-4 rounded-2xl hover:bg-surface border border-transparent hover:border-outline/50 transition-all duration-300 group">
+          <div class="text-center  p-6 space-y-4 rounded-2xl hover:bg-surface border border-transparent hover:border-outline/50 transition-all duration-300 group">
             <div class="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto transition-transform group-hover:scale-110 shadow-sm">
               <Icon name="uil:heart" class="w-6 h-6" />
             </div>
