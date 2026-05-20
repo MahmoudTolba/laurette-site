@@ -91,7 +91,7 @@
                   <span v-if="subtotal > 0" class="font-semibold text-text">{{ shippingFee }} EGP</span>
                   <span v-else class="font-semibold text-text">0 EGP</span>
                 </div>
-                
+             
                 <hr class="border-outline/50 my-2" />
                 
                 <div class="flex justify-between text-base font-bold text-text">
