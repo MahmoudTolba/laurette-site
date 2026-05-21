@@ -95,7 +95,7 @@
 
           <div v-if="auth.isLoggedIn" class="hidden sm:flex items-center gap-2">
             <span
-              class="text-xs font-semibold max-w-[120px] truncate"
+              class="text-xs font-semibold max-w-[120px] truncate hover:text-primary transition-colors scale-105"
               :class="isHomePage ? 'text-white' : 'text-text'"
             >
               Hi, {{ auth.displayName }}

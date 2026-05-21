@@ -2,6 +2,7 @@
   <div class="bg-background min-h-screen">
     <NuxtLayout>
       <NuxtPage />
+      <WhatsAppFloat />
     </NuxtLayout>
     
   </div>
