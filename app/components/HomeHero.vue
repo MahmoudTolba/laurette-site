@@ -28,11 +28,11 @@
 
           
 
-          <span class="inline-block bg-primary/90 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider animate-fade-in-down">
+          <!-- <span class="inline-block bg-primary/90 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider animate-fade-in-down">
 
             New Arrival: Authentic Korean Products
 
-          </span>
+          </span> -->
 
   
 
@@ -96,7 +96,7 @@
 
   
 
-      <button 
+      <!-- <button 
 
         @click="scrollToOffers" 
 
@@ -110,7 +110,7 @@
 
         <Icon name="heroicons:chevron-double-down" class="w-6 h-6 drop-shadow-md" />
 
-      </button>
+      </button> -->
 
     </section>
 
