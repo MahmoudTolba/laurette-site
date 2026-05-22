@@ -38,17 +38,17 @@
 
               </a>
 
-              <a href="#" class="p-2 bg-white/5 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
+              <!-- <a href="#" class="p-2 bg-white/5 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
 
                 <Icon name="uil:twitter" class="w-5 h-5" />
 
-              </a>
+              </a> -->
 
-              <a href="#" class="p-2 bg-white/5 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
+              <!-- <a href="#" class="p-2 bg-white/5 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
 
                 <Icon name="uil:youtube" class="w-5 h-5" />
 
-              </a>
+              </a> -->
 
             </div>
 
@@ -210,7 +210,7 @@
 
     { name: 'Hair Care', path: '/category/hair-care' },
 
-    { name: 'Korean Cosmetics', path: '/category/korean-care' },
+    // { name: 'Korean Cosmetics', path: '/category/korean-care' },
 
     { name: 'Makeup Set', path: '/category/makeup' },
 
@@ -224,11 +224,11 @@
 
     { name: 'Contact Support', path: '/ContactUs' },
 
-    { name: 'Shipping & Returns', path: '/shipping' },
+    // { name: 'Shipping & Returns', path: '/shipping' },
 
-    { name: 'Privacy Policy', path: '/privacy' },
+    // { name: 'Privacy Policy', path: '/privacy' },
 
-    { name: 'Terms of Service', path: '/terms' },
+    // { name: 'Terms of Service', path: '/terms' },
 
   ];
 

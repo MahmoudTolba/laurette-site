@@ -6,24 +6,27 @@
       : 'absolute bg-surface/95 backdrop-blur-md border-b border-outline shadow-soft'"
     dir="ltr"
   >
-    <div class="container mx-auto px-4 py-3 lg:py-5 flex items-center justify-between gap-4">
-      <button
-        @click="isMenuOpen = true"
-        class="lg:hidden p-2 rounded-xl transition-colors"
-        :class="isHomePage ? 'hover:bg-white/10 text-white' : 'hover:bg-primary/10 text-text'"
-        aria-label="Open Menu"
-      >
-        <Icon name="heroicons:bars-3-bottom-left" class="w-7 h-7" />
-      </button>
+    <div class="container mx-auto px-4 py-3 lg:py-5 flex items-center justify-between gap-2 md:gap-4">
+      
+      <div class="flex items-center justify-start lg:hidden flex-1">
+        <button
+          @click="isMenuOpen = true"
+          class="p-2 rounded-xl transition-colors"
+          :class="isHomePage ? 'hover:bg-white/10 text-white' : 'hover:bg-primary/10 text-text'"
+          aria-label="Open Menu"
+        >
+          <Icon name="heroicons:bars-3-bottom-left" class="w-7 h-7" />
+        </button>
+      </div>
 
-      <div class="flex-shrink-0 flex items-center">
+      <div class="flex items-center justify-center lg:justify-start flex-initial lg:flex-shrink-0">
         <NuxtLink to="/" class="block transform hover:scale-105 transition-transform duration-300">
-          <img src="~/assets/images/logo.png" alt="Laurette Store" class="h-10 md:h-14 lg:h-16 w-auto" />
+          <img src="~/assets/images/logo.png" alt="Laurette Store" class="h-10 md:h-14 lg:h-16 w-auto object-contain" />
         </NuxtLink>
       </div>
 
       <nav
-        class="hidden lg:flex items-center gap-6 xl:gap-8 font-semibold"
+        class="hidden lg:flex items-center gap-6 xl:gap-8 font-semibold mx-auto"
         :class="isHomePage ? 'text-white' : 'text-text'"
       >
         <NuxtLink
@@ -37,7 +40,8 @@
         </NuxtLink>
       </nav>
 
-      <div class="flex items-center gap-1 md:gap-3 flex-1 justify-end">
+      <div class="flex items-center gap-1 md:gap-3 justify-end flex-1">
+        
         <div class="relative hidden sm:block group max-w-[150px] lg:max-w-xs w-full">
           <input
             v-model="searchQuery"
@@ -85,25 +89,25 @@
           </div>
         </div>
 
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center gap-0.5 sm:space-x-1">
           <button
+            @click="isMobileSearchOpen = !isMobileSearchOpen"
             class="p-2 rounded-full sm:hidden transition-all"
             :class="isHomePage ? 'hover:bg-white/10 text-white' : 'hover:bg-primary/10 text-text'"
           >
-            <Icon name="uil:search" class="w-6 h-6" />
+            <Icon :name="isMobileSearchOpen ? 'heroicons:x-mark' : 'uil:search'" class="w-6 h-6" />
           </button>
 
           <div v-if="auth.isLoggedIn" class="hidden sm:flex items-center gap-2">
             <span
-              class="text-xs font-semibold max-w-[120px] truncate hover:text-primary transition-colors scale-105"
+              class="text-xs font-semibold max-w-[120px] truncate"
               :class="isHomePage ? 'text-white' : 'text-text'"
             >
               Hi, {{ auth.displayName }}
             </span>
             <button
               @click="openLogoutModal"
-              class="p-2 rounded-full transition-all group"
-              :class="isHomePage ? 'hover:bg-white/10 text-white hover:text-primary' : 'hover:bg-primary/10 text-text hover:text-primary'"
+              class="p-2 rounded-full transition-all group text-text"
               title="Logout"
             >
               <Icon name="uil:sign-out-alt" class="w-6 h-6" />
@@ -113,7 +117,7 @@
             v-else
             @click="navigateTo('/login')"
             class="p-2 rounded-full transition-all group"
-            :class="isHomePage ? 'hover:bg-white/10 text-white hover:text-primary' : 'hover:bg-primary/10 text-text hover:text-primary'"
+            :class="isHomePage ? 'text-white' : 'text-text'"
           >
             <Icon name="uil:user" class="w-6 h-6" />
           </button>
@@ -122,64 +126,110 @@
             <button
               @click="navigateTo('/cart')"
               class="p-2 rounded-full transition-all"
-              :class="isHomePage ? 'hover:bg-white/10 text-white hover:text-primary' : 'hover:bg-primary/10 text-text hover:text-primary'"
+              :class="isHomePage ? 'text-white' : 'text-text'"
             >
               <Icon name="uil:shopping-cart" class="w-6 h-6" />
             </button>
             <span 
               v-if="cartCount > 0"
-              class="absolute -top-1 -right-1 bg-gradient-to-tr from-secondary to-primary text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center border-2 border-transparent shadow-sm font-bold animate-pulse-slow"
+              class="absolute -top-1 -right-1 bg-gradient-to-tr from-secondary to-primary text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse-slow"
             >
               {{ cartCount }}
             </span>
           </div>
         </div>
       </div>
+
+    </div>
+
+    <div 
+      v-if="isMobileSearchOpen" 
+      class="sm:hidden px-4 pb-4 pt-1 bg-white border-b border-outline relative z-[95]"
+    >
+      <div class="relative w-full">
+        <input
+          v-model="searchQuery"
+          @keyup.enter="goToProductsPageMobile"
+          type="text"
+          placeholder="Search beauty..."
+          class="w-full rounded-full py-2.5 pr-4 pl-10 outline-none text-sm text-right bg-background border border-outline text-text focus:bg-white focus:ring-4 focus:ring-primary/20"
+        />
+        <Icon
+          @click="goToProductsPageMobile"
+          name="uil:search"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 cursor-pointer text-muted"
+        />
+
+        <div 
+          v-if="searchQuery && liveResults.length > 0" 
+          class="absolute top-full right-0 left-0 mt-2 bg-white border border-outline rounded-2xl shadow-xl z-[150] overflow-hidden max-h-64 overflow-y-auto text-right"
+        >
+          <div class="p-2.5 bg-gray-50 text-[10px] font-bold text-gray-400 border-b border-outline/30 tracking-wider">LIVE RESULTS</div>
+          
+          <NuxtLink 
+            v-for="product in liveResults" 
+            :key="product.id"
+            :to="`/products/${product.id}`"
+            @click="searchQuery = ''; isMobileSearchOpen = false"
+            class="flex items-center gap-3 p-2.5 hover:bg-primary/5 border-b border-gray-50 last:border-0 transition-colors"
+          >
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-semibold text-text truncate">{{ product.name }}</h4>
+              <span class="text-[11px] font-bold text-primary block mt-0.5">{{ product.price }} EGP</span>
+            </div>
+            <img :src="product.image" :alt="product.name" class="w-9 h-9 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" />
+          </NuxtLink>
+        </div>
+      </div>
     </div>
 
     <Transition name="fade">
-      <div v-if="isMenuOpen" @click="isMenuOpen = false" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] lg:hidden" />
+      <div v-if="isMenuOpen" @click="isMenuOpen = false" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[200] lg:hidden" />
     </Transition>
 
     <Transition name="slide">
-      <aside v-if="isMenuOpen" class="fixed top-0 left-0 h-full w-[280px] bg-white z-[120] shadow-[10px_0_30px_rgba(0,0,0,0.1)] lg:hidden flex flex-col" dir="ltr">
-        <div class="p-6 flex justify-between items-center border-b border-outline/30">
-          <img src="~/assets/images/logo.png" alt="Logo" class="h-10 w-auto" />
-          <button @click="isMenuOpen = false" class="p-2 bg-background hover:bg-primary/10 hover:text-primary rounded-full transition-colors">
+      <aside 
+        v-if="isMenuOpen" 
+        class="fixed top-0 left-0 h-screen w-[290px] bg-white text-text z-[250] lg:hidden flex flex-col shadow-[5px_0_25px_rgba(0,0,0,0.3)] select-none" 
+        dir="ltr"
+      >
+        <div class="p-5 flex justify-between items-center border-b border-gray-100 bg-white">
+          <img src="~/assets/images/logo.png" alt="Logo" class="h-9 w-auto object-contain" />
+          <button @click="isMenuOpen = false" class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-text">
             <Icon name="heroicons:x-mark" class="w-6 h-6" />
           </button>
         </div>
 
-        <nav class="p-6 flex flex-col gap-2 overflow-y-auto">
+        <nav class="p-4 flex flex-col gap-1.5 overflow-y-auto flex-1 bg-white">
           <NuxtLink
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
             @click="isMenuOpen = false"
-            class="flex items-center gap-4 p-3 rounded-xl text-muted hover:bg-primary/10 hover:text-primary transition-all group"
+            class="flex items-center gap-4 p-3 rounded-xl text-text hover:bg-primary/10 hover:text-primary transition-all group"
           >
-            <div class="w-10 h-10 rounded-lg bg-background flex items-center justify-center group-hover:bg-white transition-colors shadow-sm">
-              <Icon :name="link.icon" class="w-5 h-5 opacity-70 group-hover:opacity-100" />
+            <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm">
+              <Icon :name="link.icon" class="w-5 h-5 text-text group-hover:text-primary opacity-80" />
             </div>
-            <span class="font-medium text-[16px]">{{ link.name }}</span>
+            <span class="font-medium text-[15px]">{{ link.name }}</span>
           </NuxtLink>
         </nav>
 
-        <div class="mt-auto p-6 border-t border-outline/30 space-y-3">
-          <p v-if="auth.isLoggedIn" class="text-sm font-semibold text-text text-center">
-            Welcome, {{ auth.displayName }}
+        <div class="p-5 border-t border-gray-100 space-y-3 bg-gray-50/50">
+          <p v-if="auth.isLoggedIn" class="text-xs font-semibold text-text text-center">
+            Welcome, <span class="text-primary">{{ auth.displayName }}</span>
           </p>
           <button
             v-if="auth.isLoggedIn"
             @click="openLogoutModal"
-            class="w-full border border-outline text-text py-3 rounded-xl font-bold hover:bg-primary/10 hover:text-primary transition-colors"
+            class="w-full bg-white border border-gray-200 text-text py-2.5 rounded-xl text-sm font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             Logout
           </button>
           <button
             v-else
             @click="isMenuOpen = false; navigateTo('/login')"
-            class="w-full bg-gradient-to-r from-secondary to-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/20"
+            class="w-full bg-gradient-to-r from-secondary to-primary text-white py-2.5 rounded-xl text-sm font-bold shadow-md"
           >
             Login / Sign Up
           </button>
@@ -187,7 +237,6 @@
       </aside>
     </Transition>
 
-    <!-- استدعاء كومبوننت الموديول هنا -->
     <LogoutModal 
       :is-open="showLogoutModal" 
       @close="showLogoutModal = false" 
@@ -201,18 +250,16 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const isMenuOpen = ref(false)
+const isMobileSearchOpen = ref(false) 
 const searchQuery = ref('')
 
-// 🟢 حالة الموديول (مفتوح / مغلق)
 const showLogoutModal = ref(false)
 
-// 🟢 عند الضغط على زر الخروج (يفتح الموديول ويقفل القائمة الجانبية للموبايل إذا كانت مفتوحة)
 const openLogoutModal = () => {
   isMenuOpen.value = false
   showLogoutModal.value = true
 }
 
-// 🟢 تأكيد الخروج من الاستور والتوجه للرئيسية
 const handleConfirmLogout = () => {
   showLogoutModal.value = false
   auth.logout()
@@ -221,15 +268,12 @@ const handleConfirmLogout = () => {
 
 const isHomePage = computed(() => route.path === '/')
 
-// 🔵 استدعاء نفس الحالة المشتركة للسلة (Shared Cart State) ليقرأ منها الهيدر مباشرة
 const cart = useState('cart', () => [])
 
-// 🔵 حساب إجمالي عدد القطع في السلة ديناميكياً بناءً على كمية كل منتج
 const cartCount = computed(() => {
   return cart.value.reduce((total, item) => total + (item.quantity || 0), 0)
 })
 
-// نفس قاعدة بيانات المنتجات (Mock Data) للبحث المطابق بداخلها فوريّاً
 const productsMockDatabase = [
   { id: 1, name: 'Topface Instyle Creamy Lipstick 001.', price: 188, image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=100' },
   { id: 2, name: 'Topface Micellar Cleansing Water 150 ml.', price: 193, image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=100' },
@@ -239,26 +283,31 @@ const productsMockDatabase = [
   { id: 6, name: 'Luxury Rose Treatment Facial Oil', price: 450, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=100' }
 ]
 
-// مراقبة حقل الإدخال لفلترة المنتجات فوراً وعرضها بالقائمة المنسدلة
 const liveResults = computed(() => {
   if (!searchQuery.value.trim()) return []
   return productsMockDatabase.filter(p => 
     p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  ).slice(0, 4) // قصر العرض على أول 4 منتجات مطابقة للحفاظ على جمالية المظهر
+  ).slice(0, 4)
 })
 
-// دالة توجيه العميل لصفحة المنتجات وتمرير الكلمة في الرابط (Query Param) عند ضغط Enter
 const goToProductsPage = () => {
   if (searchQuery.value.trim()) {
     router.push({ path: '/products', query: { search: searchQuery.value } })
-    searchQuery.value = '' // تصفير الخانة لتغلق القائمة المنسدلة تلقائياً بعد الانتقال
+    searchQuery.value = ''
+  }
+}
+
+const goToProductsPageMobile = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ path: '/products', query: { search: searchQuery.value } })
+    searchQuery.value = ''
+    isMobileSearchOpen.value = false 
   }
 }
 
 const navLinks = [
   { name: 'Home', path: '/', icon: 'uil:home' },
   { name: 'Products', path: '/products', icon: 'uil:box' },
-  // { name: 'Korean Care', path: '/korean', icon: 'uil:star' },
   { name: 'Make Up', path: '/category/makeup', icon: 'uil:brush-alt' },
   { name: 'Routines', path: '/routines', icon: 'uil:schedule' },
   { name: 'About Us', path: '/about', icon: 'uil:info-circle' },
@@ -277,23 +326,18 @@ const navLinks = [
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
 }
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
 
-.slide-enter-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+.slide-enter-active,
 .slide-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.slide-enter-from {
-  transform: translateX(-100%);
-  opacity: 0;
-}
+.slide-enter-from,
 .slide-leave-to {
   transform: translateX(-100%);
 }

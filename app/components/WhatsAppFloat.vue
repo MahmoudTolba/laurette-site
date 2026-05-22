@@ -4,7 +4,7 @@
       
       <!-- Tooltip -->
       <span class="whatsapp-tooltip">
-        تواصل معنا
+        contact us
       </span>
   
       <!-- WhatsApp Button -->
