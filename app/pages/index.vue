@@ -60,6 +60,7 @@
   
       </section>
       <HomeOffers />
+      <ProductPackages />
   
     </div>
   </template>

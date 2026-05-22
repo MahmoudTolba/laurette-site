@@ -323,6 +323,7 @@ const navLinks = [
   { name: 'Products', path: '/products', icon: 'uil:box' },
   { name: 'Make Up', path: '/category/makeup', icon: 'uil:brush-alt' },
   { name: 'Routines', path: '/routines', icon: 'uil:schedule' },
+  { name: 'Packages', path: '/packages', icon: 'uil:box' },
   { name: 'About Us', path: '/about', icon: 'uil:info-circle' },
   { name: 'Contact Us', path: '/ContactUs', icon: 'uil:envelope' },
 ]
