@@ -268,7 +268,20 @@ const handleConfirmLogout = () => {
 
 const isHomePage = computed(() => route.path === '/')
 
+// 🟢 استدعاء السلة المشتركة ذاتها
 const cart = useState('cart', () => [])
+
+// 🟢 مراقبة وحفظ ومزامنة السلة مع الـ LocalStorage لمنع التصفير عند الريفريش
+onMounted(() => {
+  const savedCart = localStorage.getItem('laurette_cart')
+  if (savedCart) {
+    cart.value = JSON.parse(savedCart)
+  }
+
+  watch(cart, (newCart) => {
+    localStorage.setItem('laurette_cart', JSON.stringify(newCart))
+  }, { deep: true })
+})
 
 const cartCount = computed(() => {
   return cart.value.reduce((total, item) => total + (item.quantity || 0), 0)
