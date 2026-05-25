@@ -1,48 +1,61 @@
+import { defineStore } from 'pinia'
+
 export interface AuthUser {
   name: string
   email: string
 }
 
-const STORAGE_KEY = 'laurette-auth'
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as AuthUser | null,
-    hydrated: false,
+    // الـ state الأساسي مش محتاج تخزين يدوي خلاص
+    customUser: null as AuthUser | null,
   }),
 
   getters: {
-    isLoggedIn: (state) => !!state.user,
-    displayName: (state) => state.user?.name ?? '',
+    // 1. التحقق من تسجيل الدخول عن طريق سوبابيز أو الـ state المخصص
+    isLoggedIn(): boolean {
+      const supabaseUser = useSupabaseUser()
+      return !!supabaseUser.value
+    },
+
+    // 2. جلب الاسم نظيف وسريع من الـ Metadata المخرنة في سوبابيز
+    displayName(): string {
+      const supabaseUser = useSupabaseUser()
+      
+      // لو لسه مغيرين الـ state في نفس اللحظة (حالة الـ login/register)
+      if (this.customUser?.name) return this.customUser.name
+      
+      // قراءة الاسم من الـ user_metadata اللي سجلناها في سوبابيز
+      return supabaseUser.value?.user_metadata?.full_name ?? supabaseUser.value?.email?.split('@')[0] ?? ''
+    },
+
+    // 3. جلب الإيميل
+    displayEmail(): string {
+      const supabaseUser = useSupabaseUser()
+      return supabaseUser.value?.email ?? this.customUser?.email ?? ''
+    }
   },
 
   actions: {
-    hydrate() {
-      if (!import.meta.client || this.hydrated) return
+    // دالة الـ login هتحتاج بس تثبت الاسم لحظياً بعد التسجيل/الدخول
+    login(user: AuthUser) {
+      this.customUser = user
+    },
 
+    // دالة تسجيل الخروج هتنظف الـ state وتعمل signOut من سوبابيز
+    async logout() {
+      const supabase = useSupabaseClient()
+      this.customUser = null
+      
       try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-          this.user = JSON.parse(raw) as AuthUser
-        }
-      } catch {
-        localStorage.removeItem(STORAGE_KEY)
-      }
-
-      this.hydrated = true
-    },
-
-    login(user: AuthUser, remember = true) {
-      this.user = user
-      if (import.meta.client && remember) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
-      }
-    },
-
-    logout() {
-      this.user = null
-      if (import.meta.client) {
-        localStorage.removeItem(STORAGE_KEY)
+        const { error } = await supabase.auth.signOut()
+        if (error) throw error
+        
+        // توجيه المستخدم لصفحة تسجيل الدخول بعد الخروج
+        const router = useRouter()
+        await router.push('/login')
+      } catch (error: any) {
+        console.error('Error during logout:', error.message)
       }
     },
   },

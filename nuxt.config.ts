@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'Laurette Store',
+      link: [
+        { rel: "icon", type: "image/png", href: "/logo.png" },
+
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0' },
+      ],
       meta: [
         { name: 'description', content: 'Laurette Store' },
       ],
@@ -14,11 +19,14 @@ export default defineNuxtConfig({
   },
   ssr: true,
 
-
   modules: [
     '@nuxt/icon',
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
     '@pinia/nuxt',
+    '@nuxtjs/supabase',
   ],
+  supabase: {
+    redirect: false,
+  },
 })

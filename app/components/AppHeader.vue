@@ -241,6 +241,7 @@
       :is-open="showLogoutModal" 
       @close="showLogoutModal = false" 
       @confirm="handleConfirmLogout" 
+      
     />
   </header>
 </template>
