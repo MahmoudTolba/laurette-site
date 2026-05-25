@@ -4,7 +4,9 @@
       
       <div class="text-center max-w-xl mx-auto mb-12 space-y-3">
         <span class="text-xs font-bold tracking-widest uppercase text-primary">Our Collections</span>
-        <h1 class="text-4xl font-serif text-text">Shop All Products</h1>
+        <h1 class="text-4xl font-serif text-text">
+          {{ seoTitleContext }}
+        </h1>
         <p class="text-muted text-sm leading-relaxed">
           Explore our handpicked selection of clean cosmetics, non-toxic formulations, and imported authentic Korean skincare.
         </p>
@@ -51,7 +53,7 @@
         
         <aside class="hidden lg:block lg:col-span-3 bg-white p-6 rounded-2xl border border-outline/50 shadow-sm space-y-8 sticky top-32">
           <div class="space-y-3">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-text pb-2 border-b border-outline/50">Categories</h3>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-text pb-2 border-b border-outline/50">Categories</h2>
             <div class="space-y-2">
               <label 
                 v-for="cat in categories" 
@@ -70,7 +72,7 @@
           </div>
 
           <div class="space-y-3">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-text pb-2 border-b border-outline/50">Max Price</h3>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-text pb-2 border-b border-outline/50">Max Price</h2>
             <div class="space-y-2">
               <input 
                 type="range" 
@@ -120,7 +122,7 @@
                 
                 <img 
                   :src="product.image_url" 
-                  :alt="product.title" 
+                  :alt="`Laurette - ${product.title}`" 
                   class="max-h-full max-w-full object-contain mix-blend-multiply transform group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                 />
@@ -130,9 +132,9 @@
                 <span class="text-[10px] uppercase font-bold text-muted/70 tracking-wider">{{ product.category || 'Beauty' }}</span>
                 
                 <NuxtLink :to="`/products/${product.id}`" class="block">
-                  <h2 class="text-sm font-semibold text-text line-clamp-2 min-h-[40px] hover:text-primary transition-colors cursor-pointer">
+                  <h3 class="text-sm font-semibold text-text line-clamp-2 min-h-[40px] hover:text-primary transition-colors cursor-pointer">
                     {{ product.title }}
-                  </h2>
+                  </h3>
                 </NuxtLink>
 
                 <div class="flex items-center text-amber-400">
@@ -247,7 +249,7 @@ const itemsPerPage = ref(8)
 
 const cart = useState('cart', () => [])
 
-// 🌟 1. استخراج الأقسام الفريدة من الداتابيز أوتوماتيكياً
+// 1. استخراج الأقسام الفريدة من الداتابيز أوتوماتيكياً
 const categories = computed(() => {
   if (!products.value.length) return []
   
@@ -258,7 +260,7 @@ const categories = computed(() => {
   return [...new Set(allCategories)]
 })
 
-// 🌟 2. دالة تحويل الاسم لـ Slug متوافق مع الـ URL (مثال: 'Skin Care' لـ 'skin-care')
+// 2. دالة تحويل الاسم لـ Slug متوافق مع الـ URL
 const slugify = (text) => {
   if (!text) return ''
   return text
@@ -290,12 +292,11 @@ onMounted(() => {
   fetchAllProducts()
 })
 
-// 🌟 3. المراقبة الذكية للرابط مع دعم الأقسام الديناميكية الجاية من الداتابيز
+// 3. المراقبة الذكية للرابط مع دعم الأقسام الديناميكية الجاية من الداتابيز
 watch(
   [() => route.query.category, categories],
   ([newCategorySlug, currentCategories]) => {
     if (newCategorySlug && currentCategories.length > 0) {
-      // بندور على القسم الحقيقي اللي الـ Slug بتاعه بيطابق الـ query
       const targetCategory = currentCategories.find(cat => slugify(cat) === newCategorySlug)
       if (targetCategory && !selectedCategories.value.includes(targetCategory)) {
         selectedCategories.value = [targetCategory]
@@ -313,7 +314,7 @@ watch(selectedCategories, (newVal) => {
   }
 })
 
-// الـ Computed الخاص بفلترة الداتا الحقيقية محلياً بعد جلبها بالكامل لجعل التنقل أسرع وسلس
+// الـ Computed الخاص بفلترة الداتا الحقيقية محلياً
 const filteredProducts = computed(() => {
   let result = [...products.value]
 
@@ -409,15 +410,65 @@ const resetAllFilters = () => {
   router.push({ path: '/products', query: {} })
 }
 
-// 🌟 دالة ديناميكية لترجمة الـ Slug للاسم الأصلي عشان الـ Badge فوق يقرأ صح
 const translateSlugToName = (slug) => {
   if (!slug) return ''
   const targetCategory = categories.value.find(cat => slugify(cat) === slug)
   return targetCategory || slug
 }
 
-useHead({
-  title: 'Shop Clean Beauty & Skincare | Laurette Store'
+// ==========================================
+// 🌟 تحديثات الـ SEO الديناميكية (Dynamic SEO Management)
+// ==========================================
+
+// عنوان الـ H1 والـ Meta Title بناءً على القسم المفتوح أو كلمة البحث الحالية
+const seoTitleContext = computed(() => {
+  if (route.query.category) {
+    return `Shop ${translateSlugToName(route.query.category)} Collections`
+  }
+  if (route.query.search) {
+    return `Search Results for "${route.query.search}"`
+  }
+  return 'Shop All Products'
+})
+
+const seoDescriptionContext = computed(() => {
+  if (route.query.category) {
+    return `Discover our premium, handpicked selection of authentic ${translateSlugToName(route.query.category)} products. Clean cosmetics and non-toxic skincare at Laurette Store Egypt.`
+  }
+  return 'Explore our handpicked selection of clean cosmetics, non-toxic formulations, and imported authentic Korean skincare at Laurette Store. Safe beauty products for your skin.'
+})
+
+// إعداد الميتا والكانونيكال بشكل متجاوب وديناميكي
+useHead(() => {
+  const baseTitle = `${seoTitleContext.value} | Laurette Store`
+  const description = seoDescriptionContext.value
+  
+  // بناء الـ Canonical URL لمنع الـ Duplicate Content بسبب الـ Query Parameters والـ Pagination
+  const siteUrl = 'https://laurette-store.com' // استبدله بدومين موقعك الحقيقي
+  let canonicalPath = `${siteUrl}/products`
+  if (route.query.category) {
+    canonicalPath += `?category=${route.query.category}`
+  }
+
+  return {
+    title: baseTitle,
+    meta: [
+      { name: 'description', content: description },
+      // Open Graph Tags (Facebook, WhatsApp, LinkedIn)
+      { property: 'og:title', content: baseTitle },
+      { property: 'og:description', content: description },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: canonicalPath },
+      { property: 'og:image', content: 'https://laurette-store.com/og-image.jpg' }, // حط رابط لوجو أو صورة مناسبة للمتجر هنا
+      // Twitter Tags
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: baseTitle },
+      { name: 'twitter:description', content: description }
+    ],
+    link: [
+      { rel: 'canonical', href: canonicalPath }
+    ]
+  }
 })
 </script>
 
