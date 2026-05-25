@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     },
     pageTransition: { name: 'boutique', mode: 'out-in' },
   },
+  ssr: true,
 
 
   modules: [
