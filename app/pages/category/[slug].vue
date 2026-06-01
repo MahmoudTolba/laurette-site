@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 max-w-7xl">
       
       <div class="text-center max-w-xl mx-auto mb-12 space-y-3">
-        <span class="text-xs font-bold tracking-widest uppercase text-primary">Category Collection</span>
+        <span class="text-xl font-bold tracking-widest uppercase text-primary">Category Collection</span>
         <h1 class="text-4xl font-serif text-text capitalize">Shop {{ categoryName }}</h1>
         <p class="text-muted text-sm leading-relaxed">
           Discover our curated premium products under the {{ categoryName }} collection, tailored specially for your pristine daily routine.
