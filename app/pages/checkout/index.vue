@@ -118,7 +118,7 @@
                       />
                       <div class="space-y-0.5">
                         <span class="text-sm font-bold text-text block">Bank / Wallet Transfer</span>
-                        <span class="text-xs text-muted">InstaPay, Vodafone Cash, or Bank.</span>
+                        <span class="text-xs text-muted">InstaPay, Vodafone Cash.</span>
                       </div>
                     </label>
                   </div>
