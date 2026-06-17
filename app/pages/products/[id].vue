@@ -2,24 +2,34 @@
   <main class="min-h-screen bg-background font-sans pt-36 pb-20 lg:pt-44" dir="ltr">
     <div class="container mx-auto px-4 max-w-6xl">
       
-      <nav aria-label="Breadcrumb" class="flex items-center space-x-2 text-xs md:text-sm text-muted/70 mb-8">
-        <NuxtLink to="/" class="hover:text-primary transition-colors">Home</NuxtLink>
-        <Icon name="heroicons:chevron-right" class="w-3 h-3" />
+      <nav aria-label="Breadcrumb" class="flex items-center flex-wrap gap-2 text-xs md:text-sm text-muted/70 mb-8">
+        <NuxtLink to="/" class="hover:text-primary transition-colors font-medium">Home</NuxtLink>
+        <Icon name="heroicons:chevron-right" class="w-3 h-3 text-muted/40" />
         
-        <NuxtLink to="/products" class="hover:text-primary transition-colors">Products</NuxtLink>
-        <Icon name="heroicons:chevron-right" class="w-3 h-3" />
+        <NuxtLink to="/products" class="hover:text-primary transition-colors font-medium">Products</NuxtLink>
         
-        <template v-if="product">
+        <template v-if="product && product.category">
+          <Icon name="heroicons:chevron-right" class="w-3 h-3 text-muted/40" />
           <NuxtLink 
             :to="`/products?category=${slugify(product.category)}`" 
-            class="hover:text-primary transition-colors hidden sm:inline-block"
+            class="hover:text-primary transition-colors text-primary font-medium"
           >
-            {{ product.category }}
+            {{ formatCategoryName(product.category) }}
           </NuxtLink>
-          <Icon name="heroicons:chevron-right" class="w-3 h-3 hidden sm:inline-block" />
+        </template>
+
+        <template v-if="product && product.sub_category">
+          <Icon name="heroicons:chevron-right" class="w-3 h-3 text-muted/40" />
+          <NuxtLink 
+            :to="`/products?category=${slugify(product.category)}&subcategory=${slugify(product.sub_category)}`" 
+            class="hover:text-primary transition-colors text-primary font-medium"
+          >
+            {{ formatCategoryName(product.sub_category) }}
+          </NuxtLink>
         </template>
         
-        <span class="text-gray-600 font-medium truncate max-w-[180px] sm:max-w-xs" aria-current="page">
+        <Icon name="heroicons:chevron-right" class="w-3 h-3 text-muted/40" />
+        <span class="text-gray-600 font-semibold truncate max-w-[160px] sm:max-w-xs" aria-current="page">
           {{ product?.title || 'Product Details' }}
         </span>
       </nav>
@@ -68,7 +78,9 @@
   
         <div class="lg:col-span-7 space-y-6">
           <div class="space-y-2">
-            <span class="text-xs uppercase font-bold text-primary tracking-widest">{{ product.category }}</span>
+            <span class="text-xs uppercase font-bold text-primary tracking-widest">
+              {{ formatCategoryName(product.category) }}
+            </span>
             <h1 class="text-3xl md:text-4xl font-serif text-text leading-tight">
               {{ product.title }}
             </h1>
@@ -163,8 +175,8 @@
             
             <div class="text-sm text-muted leading-relaxed min-h-[100px] bg-white p-4 rounded-xl border border-outline/30 shadow-sm">
               <p v-if="activeTab === 'desc'">{{ product.description }}</p>
-              <!-- <p v-if="activeTab === 'usage'">{{ product.howToUse || 'No application instructions available.' }}</p> -->
-              <!-- <p v-if="activeTab === 'ingredients'" class="italic font-light">{{ product.ingredients || 'Ingredients list not provided.' }}</p> -->
+              <p v-if="activeTab === 'usage'">{{ product.howToUse || 'No application instructions available.' }}</p>
+              <p v-if="activeTab === 'ingredients'" class="italic font-light">{{ product.ingredients || 'Ingredients list not provided.' }}</p>
             </div>
           </div>
   
@@ -177,22 +189,36 @@
   
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useRoute, useState, useHead } from '#app'
+import { useRoute, useState, useHead, useAsyncData, useSupabaseClient } from '#imports'
 
-const route = useRoute();
-const productId = route.params.id;
+const route = useRoute()
+const productId = route.params.id
 
-const quantity = ref(1);
-const activeImage = ref('');
-const activeTab = ref('desc');
+const quantity = ref(1)
+const activeImage = ref('')
+const activeTab = ref('desc')
 
-const cart = useState('cart', () => []);
+const cart = useState('cart', () => [])
 
 const tabs = [
   { id: 'desc', name: 'Description' },
-  // { id: 'usage', name: 'How to Use' },
-  // { id: 'ingredients', name: 'Ingredients' }
-];
+  { id: 'usage', name: 'How to Use' },
+  { id: 'ingredients', name: 'Ingredients' }
+]
+
+// ==========================================
+// 🛠️ دوال فورمات النصوص وتوحيد الحروف
+// ==========================================
+const formatCategoryName = (text) => {
+  if (!text) return ''
+  return text
+    .toString()
+    .trim()
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
 
 const slugify = (text) => {
   if (!text) return ''
@@ -200,64 +226,64 @@ const slugify = (text) => {
 }
 
 // ========================================================
-// 🔐 Supabase Client integration
+// 🔐 سحب البيانات الفردية من سوبابيز
 // ========================================================
-const client = useSupabaseClient();
+const client = useSupabaseClient()
 
 const { data: product, pending, error } = await useAsyncData(`product-${productId}`, async () => {
   const { data, error: fetchError } = await client
     .from('products') 
     .select('*')
     .eq('id', productId)
-    .single();
+    .single()
 
-  if (fetchError) throw fetchError;
-  return data;
-});
+  if (fetchError) throw fetchError
+  return data
+})
 
-// مزامنة الصورة النشطة مباشرة بدون بناء روابط إضافية لأن الرابط متخزن كامل في الداتابيز
+// مزامنة الصورة الفعالة عند استرجاع البيانات
 watch(product, (newProd) => {
   if (newProd && newProd.image_url) {
-    activeImage.value = newProd.image_url;
+    activeImage.value = newProd.image_url
   }
-}, { immediate: true });
+}, { immediate: true })
 
-// معرض الصور الديناميكي
+// مصفوفة الجاليري
 const productGallery = computed(() => {
-  if (!product.value) return [];
-  return product.value.gallery || [product.value.image_url];
-});
+  if (!product.value) return []
+  return product.value.gallery || [product.value.image_url]
+})
 
+// إضافة المنتج والكمية إلى سلة المشتريات
 const addToCart = () => {
-  if (!product.value) return;
+  if (!product.value) return
 
-  const existingProduct = cart.value.find(item => item.id === product.value.id);
+  const existingProduct = cart.value.find(item => item.id === product.value.id)
   
   if (existingProduct) {
-    existingProduct.quantity += quantity.value;
+    existingProduct.quantity += quantity.value
   } else {
-    // نمرر البيانات بنفس الصيغة المطلوبة في الـ Cart
     cart.value.push({ 
       ...product.value, 
-      name: product.value.title, // الحفاظ على التوافق مع السلة لو بتعتمد على name
+      name: product.value.title, 
       image: product.value.image_url, 
       quantity: quantity.value 
-    });
+    })
   }
 
-  quantity.value = 1;
-};
+  quantity.value = 1
+}
 
 // ==========================================
-// 🌟 حل مشكلة عنوان التاب (SEO Title Fix)
+// 🌟 إعدادات الـ SEO والأرشفة الكاملة للمنتج
 // ==========================================
 useHead(() => {
-  const pTitle = product.value?.title || 'Product Details';
-  const pDesc = product.value?.description || '';
-  const pImg = product.value?.image_url || '';
+  const pTitle = product.value?.title || 'Product Details'
+  const pDesc = product.value?.description || ''
+  const pImg = product.value?.image_url || ''
   
-  const pageTitle = `${pTitle} | Laurette Store`;
-  const currentUrl = `https://laurette-store.com/products/${productId}`;
+  const pageTitle = `${pTitle} | Laurette Store`
+  const currentUrl = `https://laurette-store.com/products/${productId}`
 
   return {
     title: pageTitle,
