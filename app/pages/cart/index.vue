@@ -16,12 +16,12 @@
             >
               <div class="flex items-center gap-4 flex-1 min-w-0">
                 <div class="w-20 h-20 bg-gray-50 rounded-xl p-2 border border-outline/30 flex items-center justify-center flex-shrink-0">
-                  <img :src="item.image" :alt="item.name" class="max-h-full max-w-full object-contain" />
+                  <img :src="item.image || item.image_url" :alt="item.name || item.title" class="max-h-full max-w-full object-contain" />
                 </div>
                 <div class="space-y-1 min-w-0">
                   <span class="text-[10px] uppercase font-bold text-primary tracking-wider block">{{ item.category }}</span>
                   <NuxtLink :to="`/products/${item.id}`" class="text-sm md:text-base font-semibold text-text hover:text-primary transition-colors block truncate pr-2">
-                    {{ item.name }}
+                    {{ item.name || item.title }}
                   </NuxtLink>
                   <span class="text-sm font-bold text-gray-500 block">{{ item.price }} EGP</span>
                 </div>
@@ -93,12 +93,13 @@
                 />
                 <button 
                   @click="isCouponApplied ? removeCoupon() : applyCoupon()"
-                  class="px-4 py-2 rounded-xl text-xs font-bold tracking-wider uppercase transition-all border"
+                  :disabled="isCheckingCoupon"
+                  class="px-4 py-2 rounded-xl text-xs font-bold tracking-wider uppercase transition-all border disabled:opacity-50"
                   :class="isCouponApplied 
                     ? 'border-red-200 text-red-600 hover:bg-red-50' 
                     : 'border-dark bg-dark text-white hover:bg-primary hover:border-primary'"
                 >
-                  {{ isCouponApplied ? 'Remove' : 'Apply' }}
+                  {{ isCheckingCoupon ? 'Checking...' : (isCouponApplied ? 'Remove' : 'Apply') }}
                 </button>
               </div>
               
@@ -177,6 +178,11 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted } from 'vue'
+import { useState, useHead, useSupabaseClient, navigateTo } from '#imports'
+
+const supabase = useSupabaseClient()
+
 // استدعاء السلة المشتركة ذاتها
 const cart = useState('cart', () => []);
 
@@ -187,13 +193,8 @@ const shippingFee = ref(50);
 const couponInput = ref('');
 const couponError = ref('');
 const isCouponApplied = ref(false);
+const isCheckingCoupon = ref(false);
 const appliedCouponDetails = ref({ code: '', type: '', value: 0 });
-
-// قاعدة بيانات تجريبية لمحاكاة الكوبونات الفعالة من السيرفر
-const validCoupons = [
-  { code: 'LAURETTE10', type: 'percentage', value: 10 }, // خصم 10% من المجموع الفرعي
-  { code: 'BEAUTY50', type: 'fixed', value: 50 }       // خصم قيمته ثابتة 50 جنيه
-];
 
 // 🟢 تفعيل الحفظ التلقائي في الـ LocalStorage ومنع مشاكل الـ SSR
 onMounted(() => {
@@ -211,7 +212,7 @@ onMounted(() => {
 
 // حساب المجموع الفرعي للمنتجات ديناميكياً
 const subtotal = computed(() => {
-  return cart.value.reduce((total, item) => total + (item.price * item.quantity), 0);
+  return cart.value.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
 });
 
 // حساب قيمة الخصم بناءً على الكوبون النشط
@@ -232,8 +233,8 @@ const totalAmount = computed(() => {
   return finalAmount > 0 ? finalAmount : 0; // حماية لضمان عدم خروج المجموع بالسالب
 });
 
-// دالة تفعيل الكوبون والتحقق من صحته
-const applyCoupon = () => {
+// 🟢 [ربط الباك اند]: دالة تفعيل الكوبون والتحقق الكامل من جدول coupons في Supabase
+const applyCoupon = async () => {
   couponError.value = '';
   const cleanInput = couponInput.value.trim().toUpperCase();
 
@@ -242,13 +243,60 @@ const applyCoupon = () => {
     return;
   }
 
-  const foundCoupon = validCoupons.find(c => c.code === cleanInput);
+  isCheckingCoupon.value = true;
 
-  if (foundCoupon) {
+  try {
+    // استدعاء الكوبون المطابق للكود المدخل من الـ Database
+    const { data: couponData, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', cleanInput)
+      .maybeSingle()
+
+    if (error || !couponData) {
+      couponError.value = 'Invalid coupon code. Please try another one.';
+      return;
+    }
+
+    // 1. التحقق من حالة الكوبون الفعلي بالداتابيز
+    if (couponData.status !== 'active') {
+      couponError.value = 'This coupon code is currently inactive.';
+      return;
+    }
+
+    // 2. التحقق من تاريخ انتهاء الصلاحية (مع تصفير الوقت لضمان دقة المقارنة باليوم)
+    if (couponData.expiry_date) {
+      const expiry = new Date(couponData.expiry_date);
+      const today = new Date();
+      
+      expiry.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+
+      if (expiry < today) {
+        couponError.value = 'This coupon code has expired.';
+        return;
+      }
+    }
+
+    // 3. التحقق من تخطي حدود الاستخدام المسموحة للكوبون
+    if (couponData.usage_limit !== null && couponData.usage_count >= couponData.usage_limit) {
+      couponError.value = 'This coupon has reached its usage limit.';
+      return;
+    }
+
+    // تشغيل الكوبون بنجاح عند استيفاء كافة الشروط الحقيقية
     isCouponApplied.value = true;
-    appliedCouponDetails.value = foundCoupon;
-  } else {
-    couponError.value = 'Invalid coupon code. Please try another one.';
+    appliedCouponDetails.value = {
+      code: couponData.code,
+      type: couponData.type, // يتوقع 'percentage' أو 'fixed'
+      value: Number(couponData.value)
+    };
+
+  } catch (err) {
+    console.error('Coupon validation error:', err);
+    couponError.value = 'An error occurred while validating your coupon.';
+  } finally {
+    isCheckingCoupon.value = false;
   }
 };
 
@@ -260,15 +308,35 @@ const removeCoupon = () => {
   couponError.value = '';
 };
 
-// دالة تحديث الكمية (زيادة أو نقصان) من داخل السلة مباشرة
-const updateQuantity = (id, change) => {
+// 🟢 [ربط الباك اند]: دالة تحديث الكمية مع فحص المخزون الفعلي من جدول products منعاً للتعارض
+const updateQuantity = async (id, change) => {
   const item = cart.value.find(p => p.id === id);
   if (item) {
     const newQuantity = item.quantity + change;
+    
     if (newQuantity > 0) {
+      if (change > 0) {
+        try {
+          // جلب قيمة الـ stock الحالية للمنتج مباشرة من قاعدة البيانات
+          const { data: productData, error } = await supabase
+            .from('products')
+            .select('stock')
+            .eq('id', id)
+            .maybeSingle()
+
+          if (!error && productData) {
+            if (newQuantity > productData.stock) {
+              alert(`Sorry, only ${productData.stock} items are available in stock right now.`);
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('Stock validation error:', err);
+        }
+      }
+      
       item.quantity = newQuantity;
     } else {
-      // إذا نزلت الكمية عن 1 يتم حذف المنتج تلقائياً
       removeFromCart(id);
     }
   }
@@ -277,7 +345,6 @@ const updateQuantity = (id, change) => {
 // دالة حذف منتج معين بالـ ID
 const removeFromCart = (id) => {
   cart.value = cart.value.filter(item => item.id !== id);
-  // تصفير الكوبون إذا فرغت السلة تماماً أثناء الحذف لعدم تعليق العملية حسابياً
   if (cart.value.length === 0) removeCoupon();
 };
 
@@ -296,7 +363,6 @@ useHead({
 </script>
 
 <style scoped>
-/* حركات لطيفة وتأثيرات انتقال مرنة داخل الصفحة */
 .active\:scale-95:active {
   transform: scale(0.95);
 }
