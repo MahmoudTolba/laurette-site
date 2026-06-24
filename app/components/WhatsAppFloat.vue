@@ -31,7 +31,7 @@
   </template>
   
   <script setup>
-  const phone = '2010'
+  const phone = '201507077870'
   const message = 'مرحبا، اريد الاستفسار'
   
   const whatsappLink =
