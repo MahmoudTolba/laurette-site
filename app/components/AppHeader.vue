@@ -61,28 +61,36 @@
           />
 
           <div 
-            v-if="searchQuery && liveResults.length > 0" 
+            v-if="searchQuery && (liveResults.length > 0 || isSearchingBackend)" 
             class="absolute top-full right-0 left-0 mt-2 bg-white border border-outline rounded-2xl shadow-xl z-[150] overflow-hidden max-h-80 overflow-y-auto text-right"
           >
-            <div class="p-2.5 bg-gray-50 text-[10px] font-bold text-gray-400 border-b border-outline/30 tracking-wider">LIVE RESULTS</div>
+            <div class="p-2.5 bg-gray-50 text-[10px] font-bold text-gray-400 border-b border-outline/30 tracking-wider flex justify-between items-center">
+              <span v-if="isSearchingBackend" class="animate-pulse text-primary">LOADING...</span>
+              <span v-else>LIVE RESULTS</span>
+            </div>
             
             <NuxtLink 
               v-for="product in liveResults" 
               :key="product.id"
               :to="`/products/${product.id}`"
-              @click="searchQuery = ''"
+              @click="clearSearch"
               class="flex items-center gap-3 p-2.5 hover:bg-primary/5 border-b border-gray-50 last:border-0 transition-colors group"
             >
               <div class="flex-1 min-w-0">
-                <h4 class="text-xs font-semibold text-text truncate group-hover:text-primary transition-colors">{{ product.name }}</h4>
+                <h4 class="text-xs font-semibold text-text truncate group-hover:text-primary transition-colors">
+                  {{ product.title || product.name }}
+                </h4>
+                <div class="text-[10px] text-gray-400">
+                  {{ product.sub_category || product.category || '' }}
+                </div>
                 <span class="text-[11px] font-bold text-primary block mt-0.5">{{ product.price }} EGP</span>
               </div>
-              <img :src="product.image" :alt="product.name" class="w-9 h-9 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" />
+              <img :src="product.image_url || product.image" :alt="product.title || product.name" class="w-9 h-9 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" />
             </NuxtLink>
           </div>
 
           <div 
-            v-if="searchQuery && liveResults.length === 0" 
+            v-if="searchQuery && liveResults.length === 0 && !isSearchingBackend" 
             class="absolute top-full right-0 left-0 mt-2 bg-white border border-outline rounded-2xl shadow-xl z-[150] p-4 text-center text-xs text-muted"
           >
             No results for "{{ searchQuery }}"
@@ -126,7 +134,7 @@
             <button
               @click="navigateTo('/cart')"
               class="p-2 rounded-full transition-all"
-              :class="isHomePage ? 'text-white' : 'text-text'"
+              :class="isHomePage ? 'text-text' : 'text-text'"
             >
               <Icon name="uil:shopping-cart" class="w-6 h-6" />
             </button>
@@ -161,7 +169,7 @@
         />
 
         <div 
-          v-if="searchQuery && liveResults.length > 0" 
+          v-if="searchQuery && (liveResults.length > 0 || isSearchingBackend)" 
           class="absolute top-full right-0 left-0 mt-2 bg-white border border-outline rounded-2xl shadow-xl z-[150] overflow-hidden max-h-64 overflow-y-auto text-right"
         >
           <div class="p-2.5 bg-gray-50 text-[10px] font-bold text-gray-400 border-b border-outline/30 tracking-wider">LIVE RESULTS</div>
@@ -170,14 +178,14 @@
             v-for="product in liveResults" 
             :key="product.id"
             :to="`/products/${product.id}`"
-            @click="searchQuery = ''; isMobileSearchOpen = false"
+            @click="clearSearchMobile"
             class="flex items-center gap-3 p-2.5 hover:bg-primary/5 border-b border-gray-50 last:border-0 transition-colors"
           >
             <div class="flex-1 min-w-0">
-              <h4 class="text-xs font-semibold text-text truncate">{{ product.name }}</h4>
+              <h4 class="text-xs font-semibold text-text truncate">{{ product.title || product.name }}</h4>
               <span class="text-[11px] font-bold text-primary block mt-0.5">{{ product.price }} EGP</span>
             </div>
-            <img :src="product.image" :alt="product.name" class="w-9 h-9 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" />
+            <img :src="product.image_url || product.image" :alt="product.title || product.name" class="w-9 h-9 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" />
           </NuxtLink>
         </div>
       </div>
@@ -240,9 +248,7 @@
     <LogoutModal 
       :is-open="showLogoutModal" 
       @close="showLogoutModal = false" 
-      @confirm="handleConfirmLogout" 
-      
-    />
+      @confirm="handleConfirmLogout" />
   </header>
 </template>
 
@@ -250,11 +256,48 @@
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const client = useSupabaseClient() // 🟢 استدعاء عميل Supabase للبحث الديناميكي الفوري
+
 const isMenuOpen = ref(false)
 const isMobileSearchOpen = ref(false) 
 const searchQuery = ref('')
-
 const showLogoutModal = ref(false)
+const isSearchingBackend = ref(false)
+const liveResults = ref([]) // 🟢 حولناها إلى ref لتخزين النتائج الحقيقية ديناميكياً
+
+// 🟢 الـ Debounce لمنع الضغط الكثيف على قاعدة البيانات أثناء كل ضغطة حرف
+let debounceTimeout = null
+
+watch(searchQuery, (newQuery) => {
+  clearTimeout(debounceTimeout)
+  const txt = newQuery.trim().toLowerCase()
+  
+  if (!txt) {
+    liveResults.value = []
+    return
+  }
+
+  isSearchingBackend.value = true
+
+  debounceTimeout = setTimeout(async () => {
+    try {
+      // البحث داخل Supabase في أعمدة الاسم، الوصف، أو القسم
+      const { data, error } = await client
+        .from('products') // 🟢 تأكد أن اسم الجدول هنا مطابق لجدولك بالسوبابيس (مثال: 'products')
+        .select('*')
+        .or(`title.ilike.%${txt}%,description.ilike.%${txt}%,category.ilike.%${txt}%,sub_category.ilike.%${txt}%`)
+        .limit(4)
+
+      if (!error && data) {
+        liveResults.value = data
+      }
+    } catch (err) {
+      console.error("Search error:", err)
+    } finally {
+      isSearchingBackend.value = false
+    }
+  }, 300) // 300ms ثواني انتظار للتأكد من توقف المستخدم عن الكتابة
+})
 
 const openLogoutModal = () => {
   isMenuOpen.value = false
@@ -268,11 +311,8 @@ const handleConfirmLogout = () => {
 }
 
 const isHomePage = computed(() => route.path === '/')
-
-// 🟢 استدعاء السلة المشتركة ذاتها
 const cart = useState('cart', () => [])
 
-// 🟢 مراقبة وحفظ ومزامنة السلة مع الـ LocalStorage لمنع التصفير عند الريفريش
 onMounted(() => {
   const savedCart = localStorage.getItem('laurette_cart')
   if (savedCart) {
@@ -288,35 +328,34 @@ const cartCount = computed(() => {
   return cart.value.reduce((total, item) => total + (item.quantity || 0), 0)
 })
 
-const productsMockDatabase = [
-  { id: 1, name: 'Topface Instyle Creamy Lipstick 001.', price: 188, image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=100' },
-  { id: 2, name: 'Topface Micellar Cleansing Water 150 ml.', price: 193, image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=100' },
-  { id: 3, name: 'Soralone Hydra Cream Gel 100ml Offer (1+1)', price: 275, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=100' },
-  { id: 4, name: 'Soralone Cica Cream Gel 60ml Offer (1+1)', price: 295, image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=100' },
-  { id: 5, name: 'Capixy Intense Tonic Spray Offer (1+1)', price: 700, image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?q=80&w=100' },
-  { id: 6, name: 'Luxury Rose Treatment Facial Oil', price: 450, image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=100' }
-]
-
-const liveResults = computed(() => {
-  if (!searchQuery.value.trim()) return []
-  return productsMockDatabase.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  ).slice(0, 4)
-})
-
-const goToProductsPage = () => {
-  if (searchQuery.value.trim()) {
-    router.push({ path: '/products', query: { search: searchQuery.value } })
-    searchQuery.value = ''
+const goToProductsPage = async () => {
+  const queryText = searchQuery.value.trim()
+  if (queryText) {
+    await router.push({ path: '/products', query: { search: queryText } })
+    setTimeout(() => { searchQuery.value = '' }, 100)
   }
 }
 
-const goToProductsPageMobile = () => {
-  if (searchQuery.value.trim()) {
-    router.push({ path: '/products', query: { search: searchQuery.value } })
-    searchQuery.value = ''
-    isMobileSearchOpen.value = false 
+const goToProductsPageMobile = async () => {
+  const queryText = searchQuery.value.trim()
+  if (queryText) {
+    await router.push({ path: '/products', query: { search: queryText } })
+    setTimeout(() => {
+      searchQuery.value = ''
+      isMobileSearchOpen.value = false 
+    }, 100)
   }
+}
+
+const clearSearch = () => {
+  setTimeout(() => { searchQuery.value = '' }, 200)
+}
+
+const clearSearchMobile = () => {
+  setTimeout(() => {
+    searchQuery.value = ''
+    isMobileSearchOpen.value = false
+  }, 200)
 }
 
 const navLinks = [

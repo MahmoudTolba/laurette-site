@@ -436,29 +436,42 @@ watch(selectedCategories, (newVal) => {
   }
 })
 
-// فلترة وعرض الداتا بحسب المعايير المختارة
+// ========================================================
+// 🌟 فلترة وعرض الداتا بحسب المعايير المختارة (تم الإصلاح الشامل هنا)
+// ========================================================
 const filteredProducts = computed(() => {
   let result = [...products.value]
 
-  // 1. فلتر البحث
+  // 1. فلتر البحث الأساسي
   if (route.query.search) {
-    const searchWord = route.query.search.toString().toLowerCase()
-    result = result.filter(p => p.title && p.title.toLowerCase().includes(searchWord))
+    const searchWord = route.query.search.toString().trim().toLowerCase()
+    if (searchWord) {
+      result = result.filter(p => {
+        const titleMatch = p.title && p.title.toLowerCase().includes(searchWord)
+        const categoryMatch = p.category && p.category.toLowerCase().includes(searchWord)
+        const subCategoryMatch = p.sub_category && p.sub_category.toLowerCase().includes(searchWord)
+        
+        return titleMatch || categoryMatch || subCategoryMatch
+      })
+    }
   }
 
-  // 2. فلتر السعر
+  // 2. فلتر السعر يطبق دائماً
   result = result.filter(p => p.price <= maxPrice.value)
 
-  // 3. فلتر الأقسام الرئيسية (Sidebar)
-  if (selectedCategories.value.length > 0) {
-    const selectedLower = selectedCategories.value.map(c => c.toLowerCase())
-    result = result.filter(p => p.category && selectedLower.includes(p.category.toLowerCase()))
-  }
+  // 3 & 4. فلاتر الأقسام (تُطبق فقط إذا لم يكن هناك كلمة بحث عامة، لمنع تصفير النتائج والتعارض)
+  if (!route.query.search) {
+    // فلتر الأقسام الرئيسية (Sidebar)
+    if (selectedCategories.value.length > 0) {
+      const selectedLower = selectedCategories.value.map(c => c.toLowerCase())
+      result = result.filter(p => p.category && selectedLower.includes(p.category.toLowerCase()))
+    }
 
-  // 4. فلتر الأقسام الفرعية العلوي
-  if (activeSubCategory.value !== 'ALL') {
-    const activeSubLower = activeSubCategory.value.toLowerCase()
-    result = result.filter(p => p.sub_category && p.sub_category.toLowerCase() === activeSubLower)
+    // فلتر الأقسام الفرعية العلوي
+    if (activeSubCategory.value !== 'ALL') {
+      const activeSubLower = activeSubCategory.value.toLowerCase()
+      result = result.filter(p => p.sub_category && p.sub_category.toLowerCase() === activeSubLower)
+    }
   }
 
   // 5. الترتيب
