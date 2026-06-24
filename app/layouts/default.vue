@@ -1,6 +1,6 @@
 <template>
     <div>
-      <AppHeader />
+      <AppHeader class="sticky w-full z-50 top-0 left-0" />
       
       <slot /> 
       
